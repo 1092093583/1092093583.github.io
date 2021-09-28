@@ -129,34 +129,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Django+Redis实现排行榜功能</title>
-    <url>/2019/02/17/Django-Redis%E5%AE%9E%E7%8E%B0%E6%8E%92%E8%A1%8C%E6%A6%9C%E5%8A%9F%E8%83%BD/</url>
-    <content><![CDATA[<h2 id="Django-Redis实现排行榜功能"><a href="#Django-Redis实现排行榜功能" class="headerlink" title="Django+Redis实现排行榜功能"></a>Django+Redis实现排行榜功能</h2><h4 id="使用Redis的有序集合实现排行榜功能"><a href="#使用Redis的有序集合实现排行榜功能" class="headerlink" title="使用Redis的有序集合实现排行榜功能"></a>使用Redis的有序集合实现排行榜功能</h4><p>日常Web开发中存在着各种各样的排行榜，比如游戏中玩家的排名，音乐播放器中的听歌排行等。玩家在排行榜中的名词是实力的象征，所以名次也就成了核心玩家追求的目标。再举个反面例子，一个公</p>
-<a id="more"></a>
-
-<p>司内部的考勤系统，为了更好的呈现员工的考勤，可以将请假次数按倒序展示出来排行榜，方便直观的看出员工考勤。</p>
-<h4 id="一个典型的考勤排行榜包括以下常见功能："><a href="#一个典型的考勤排行榜包括以下常见功能：" class="headerlink" title="一个典型的考勤排行榜包括以下常见功能："></a>一个典型的考勤排行榜包括以下常见功能：</h4><ol>
-<li>能够记录员工的请假次数</li>
-<li>能够查询排名前N的员工</li>
-<li>正序、反序</li>
-</ol>
-<p>更进一步，上面的操作都需要再短时间内实时完成，这样才能最大程度发挥排行榜的作用</p>
-<p>在用户量大的情况下，由于一个用户排名的上升，大量用户的排名也会随之发生变化，如果采用传统的关系型数据库（比如MySql）来实现排行榜，将会导致对数据库的频繁修改，性能得不到满足，而利用Redis的SortSet数据结构能够非常方便搞定。</p>
-<h4 id="Redis有序集合"><a href="#Redis有序集合" class="headerlink" title="Redis有序集合"></a>Redis有序集合</h4><p>有序集合和集合一样也是 string 类型元素的集合,且<strong>不允许重复</strong>的成员。我们正是利用它有序、自动去重的特性</p>
-<h5 id="redis示例"><a href="#redis示例" class="headerlink" title="redis示例"></a>redis示例</h5><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zadd workflow <span class="number">2</span> uid1</span><br><span class="line">(integer) <span class="number">1</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrange workflow <span class="number">0</span> <span class="number">-1</span></span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrange workflow <span class="number">0</span> <span class="number">5</span> withscores</span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">2</span>) <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zadd workflow <span class="number">1</span> uid2</span><br><span class="line">(integer) <span class="number">1</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrange workflow <span class="number">0</span> <span class="number">5</span> withscores</span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid2&quot;</span></span><br><span class="line"><span class="number">2</span>) <span class="string">&quot;1&quot;</span></span><br><span class="line"><span class="number">3</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">4</span>) <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zincrby workflow <span class="number">1</span> uid2</span><br><span class="line"><span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zincrby workflow <span class="number">-1</span> uid2</span><br><span class="line"><span class="string">&quot;1&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrevrange workflow <span class="number">0</span> <span class="number">-1</span> withscores</span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">2</span>) <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">3</span>) <span class="string">&quot;uid2&quot;</span></span><br><span class="line"><span class="number">4</span>) <span class="string">&quot;1&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt;</span><br></pre></td></tr></table></figure>
-
-<h5 id="django示例"><a href="#django示例" class="headerlink" title="django示例"></a>django示例</h5><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"></span><br><span class="line">host = <span class="string">&#x27;127.0.0.1&#x27;</span></span><br><span class="line">port = <span class="number">6379</span></span><br><span class="line"></span><br><span class="line">r = redis.Redis(host=host,port=port)</span><br><span class="line"></span><br><span class="line">r.zadd(<span class="string">&#x27;z&#x27;</span>,&#123;<span class="string">&#x27;冰箱&#x27;</span>:<span class="number">20</span>&#125;)</span><br><span class="line">r.zadd(<span class="string">&#x27;z&#x27;</span>,&#123;<span class="string">&#x27;手机&#x27;</span>:<span class="number">30</span>&#125;)</span><br><span class="line"></span><br><span class="line">print(r.zrange(<span class="string">&#x27;m&#x27;</span>,<span class="number">0</span>,<span class="number">10</span>,desc=<span class="literal">True</span>,withscores=<span class="literal">True</span>))  <span class="comment">#desc=True 倒序</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="django实现"><a href="#django实现" class="headerlink" title="django实现"></a>django实现</h4><p>现在回到我们的项目中，在创建好接口后直接用zincrby()方法来将某个元素进行相应的操作。</p>
-<p>zincrby(‘key’,增减数量,增减的key)</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 操作redis缓存</span></span><br><span class="line">r.zincrby(<span class="string">&quot;workflow&quot;</span>, <span class="number">1</span>, uid)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h5 id="构造一个返回排行榜数据的接口"><a href="#构造一个返回排行榜数据的接口" class="headerlink" title="构造一个返回排行榜数据的接口"></a>构造一个返回排行榜数据的接口</h5><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShowTop</span>(<span class="params">APIView</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line"></span><br><span class="line">        type_id = request.GET.get(<span class="string">&#x27;type_id&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 获取redis排行榜   [(b&#x27;27&#x27;, 1.0), (b&#x27;24&#x27;, 1.0)]</span></span><br><span class="line">        work_click = r.zrange(type_id, <span class="number">0</span>, <span class="number">-1</span>, desc=<span class="literal">True</span>, withscores=<span class="literal">True</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> work_click:</span><br><span class="line"></span><br><span class="line">            res = []</span><br><span class="line">            ranking = <span class="number">0</span></span><br><span class="line">            <span class="keyword">for</span> item <span class="keyword">in</span> work_click:</span><br><span class="line"></span><br><span class="line">                username = User.objects.get(pk=item[<span class="number">0</span>].decode()).username</span><br><span class="line">				</span><br><span class="line">                <span class="comment"># 名次</span></span><br><span class="line">                ranking += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">                data = &#123;</span><br><span class="line">                    <span class="string">&#x27;ranking&#x27;</span>: ranking,</span><br><span class="line">                    <span class="string">&#x27;username&#x27;</span>: username,</span><br><span class="line">                    <span class="string">&#x27;count&#x27;</span>: <span class="built_in">int</span>(item[<span class="number">1</span>])</span><br><span class="line">                &#125;</span><br><span class="line">                res.append(data)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;ok&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">200</span>, <span class="string">&#x27;data&#x27;</span>: res&#125;)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;暂无排行榜&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">400</span>&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>ok，到这里后端的排行榜接口就已经完成了！</p>
-]]></content>
-  </entry>
-  <entry>
     <title>Django处理数据并发问题</title>
     <url>/2020/09/23/Django%E5%A4%84%E7%90%86%E6%95%B0%E6%8D%AE%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98/</url>
     <content><![CDATA[<h2 id="Django处理数据并发问题"><a href="#Django处理数据并发问题" class="headerlink" title="Django处理数据并发问题"></a>Django处理数据并发问题</h2><h3 id="1-数据库并发处理问题"><a href="#1-数据库并发处理问题" class="headerlink" title="1. 数据库并发处理问题"></a>1. 数据库并发处理问题</h3><p>在多个用户<strong>同时</strong>发起对同一个数据提交修改操作时（先查询，再修改），会出现资源竞争的问题，导致最终修改的数据结果出现异常。</p>
@@ -196,6 +168,34 @@
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 导入原生sql模块</span></span><br><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> connection</span><br><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> transaction</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">TestThread</span>(<span class="params">request</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> transaction.atomic():</span><br><span class="line">        res = User.objects.select_for_update().get(pk=<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> res.num &gt; <span class="number">0</span>:</span><br><span class="line"></span><br><span class="line">            <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> c:</span><br><span class="line">                c.execute(<span class="string">&#x27;update user set num = num - 1 where id = 16&#x27;</span>)</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">&quot;ok&quot;</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> HttpResponse(<span class="string">&quot;库存不足&quot;</span>)</span><br></pre></td></tr></table></figure>
 
 <p>搞定！</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Django+Redis实现排行榜功能</title>
+    <url>/2019/02/17/Django-Redis%E5%AE%9E%E7%8E%B0%E6%8E%92%E8%A1%8C%E6%A6%9C%E5%8A%9F%E8%83%BD/</url>
+    <content><![CDATA[<h2 id="Django-Redis实现排行榜功能"><a href="#Django-Redis实现排行榜功能" class="headerlink" title="Django+Redis实现排行榜功能"></a>Django+Redis实现排行榜功能</h2><h4 id="使用Redis的有序集合实现排行榜功能"><a href="#使用Redis的有序集合实现排行榜功能" class="headerlink" title="使用Redis的有序集合实现排行榜功能"></a>使用Redis的有序集合实现排行榜功能</h4><p>日常Web开发中存在着各种各样的排行榜，比如游戏中玩家的排名，音乐播放器中的听歌排行等。玩家在排行榜中的名词是实力的象征，所以名次也就成了核心玩家追求的目标。再举个反面例子，一个公</p>
+<a id="more"></a>
+
+<p>司内部的考勤系统，为了更好的呈现员工的考勤，可以将请假次数按倒序展示出来排行榜，方便直观的看出员工考勤。</p>
+<h4 id="一个典型的考勤排行榜包括以下常见功能："><a href="#一个典型的考勤排行榜包括以下常见功能：" class="headerlink" title="一个典型的考勤排行榜包括以下常见功能："></a>一个典型的考勤排行榜包括以下常见功能：</h4><ol>
+<li>能够记录员工的请假次数</li>
+<li>能够查询排名前N的员工</li>
+<li>正序、反序</li>
+</ol>
+<p>更进一步，上面的操作都需要再短时间内实时完成，这样才能最大程度发挥排行榜的作用</p>
+<p>在用户量大的情况下，由于一个用户排名的上升，大量用户的排名也会随之发生变化，如果采用传统的关系型数据库（比如MySql）来实现排行榜，将会导致对数据库的频繁修改，性能得不到满足，而利用Redis的SortSet数据结构能够非常方便搞定。</p>
+<h4 id="Redis有序集合"><a href="#Redis有序集合" class="headerlink" title="Redis有序集合"></a>Redis有序集合</h4><p>有序集合和集合一样也是 string 类型元素的集合,且<strong>不允许重复</strong>的成员。我们正是利用它有序、自动去重的特性</p>
+<h5 id="redis示例"><a href="#redis示例" class="headerlink" title="redis示例"></a>redis示例</h5><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zadd workflow <span class="number">2</span> uid1</span><br><span class="line">(integer) <span class="number">1</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrange workflow <span class="number">0</span> <span class="number">-1</span></span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrange workflow <span class="number">0</span> <span class="number">5</span> withscores</span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">2</span>) <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zadd workflow <span class="number">1</span> uid2</span><br><span class="line">(integer) <span class="number">1</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrange workflow <span class="number">0</span> <span class="number">5</span> withscores</span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid2&quot;</span></span><br><span class="line"><span class="number">2</span>) <span class="string">&quot;1&quot;</span></span><br><span class="line"><span class="number">3</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">4</span>) <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zincrby workflow <span class="number">1</span> uid2</span><br><span class="line"><span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zincrby workflow <span class="number">-1</span> uid2</span><br><span class="line"><span class="string">&quot;1&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; zrevrange workflow <span class="number">0</span> <span class="number">-1</span> withscores</span><br><span class="line"><span class="number">1</span>) <span class="string">&quot;uid1&quot;</span></span><br><span class="line"><span class="number">2</span>) <span class="string">&quot;2&quot;</span></span><br><span class="line"><span class="number">3</span>) <span class="string">&quot;uid2&quot;</span></span><br><span class="line"><span class="number">4</span>) <span class="string">&quot;1&quot;</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<h5 id="django示例"><a href="#django示例" class="headerlink" title="django示例"></a>django示例</h5><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"></span><br><span class="line">host = <span class="string">&#x27;127.0.0.1&#x27;</span></span><br><span class="line">port = <span class="number">6379</span></span><br><span class="line"></span><br><span class="line">r = redis.Redis(host=host,port=port)</span><br><span class="line"></span><br><span class="line">r.zadd(<span class="string">&#x27;z&#x27;</span>,&#123;<span class="string">&#x27;冰箱&#x27;</span>:<span class="number">20</span>&#125;)</span><br><span class="line">r.zadd(<span class="string">&#x27;z&#x27;</span>,&#123;<span class="string">&#x27;手机&#x27;</span>:<span class="number">30</span>&#125;)</span><br><span class="line"></span><br><span class="line">print(r.zrange(<span class="string">&#x27;m&#x27;</span>,<span class="number">0</span>,<span class="number">10</span>,desc=<span class="literal">True</span>,withscores=<span class="literal">True</span>))  <span class="comment">#desc=True 倒序</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="django实现"><a href="#django实现" class="headerlink" title="django实现"></a>django实现</h4><p>现在回到我们的项目中，在创建好接口后直接用zincrby()方法来将某个元素进行相应的操作。</p>
+<p>zincrby(‘key’,增减数量,增减的key)</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 操作redis缓存</span></span><br><span class="line">r.zincrby(<span class="string">&quot;workflow&quot;</span>, <span class="number">1</span>, uid)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="构造一个返回排行榜数据的接口"><a href="#构造一个返回排行榜数据的接口" class="headerlink" title="构造一个返回排行榜数据的接口"></a>构造一个返回排行榜数据的接口</h5><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShowTop</span>(<span class="params">APIView</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, request</span>):</span></span><br><span class="line"></span><br><span class="line">        type_id = request.GET.get(<span class="string">&#x27;type_id&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 获取redis排行榜   [(b&#x27;27&#x27;, 1.0), (b&#x27;24&#x27;, 1.0)]</span></span><br><span class="line">        work_click = r.zrange(type_id, <span class="number">0</span>, <span class="number">-1</span>, desc=<span class="literal">True</span>, withscores=<span class="literal">True</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> work_click:</span><br><span class="line"></span><br><span class="line">            res = []</span><br><span class="line">            ranking = <span class="number">0</span></span><br><span class="line">            <span class="keyword">for</span> item <span class="keyword">in</span> work_click:</span><br><span class="line"></span><br><span class="line">                username = User.objects.get(pk=item[<span class="number">0</span>].decode()).username</span><br><span class="line">				</span><br><span class="line">                <span class="comment"># 名次</span></span><br><span class="line">                ranking += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">                data = &#123;</span><br><span class="line">                    <span class="string">&#x27;ranking&#x27;</span>: ranking,</span><br><span class="line">                    <span class="string">&#x27;username&#x27;</span>: username,</span><br><span class="line">                    <span class="string">&#x27;count&#x27;</span>: <span class="built_in">int</span>(item[<span class="number">1</span>])</span><br><span class="line">                &#125;</span><br><span class="line">                res.append(data)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;ok&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">200</span>, <span class="string">&#x27;data&#x27;</span>: res&#125;)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;暂无排行榜&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">400</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>ok，到这里后端的排行榜接口就已经完成了！</p>
 ]]></content>
   </entry>
   <entry>
@@ -253,48 +253,6 @@
 </li>
 </ol>
 <p>其实这就是所谓的高负载高可用架构，在使用集群承担高负载的同时，也能进行高可用的容灾机制。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>MySql FIND_IN_SET()函数的使用</title>
-    <url>/2020/07/21/FIND-IN-SET-%E5%87%BD%E6%95%B0%E7%9A%84%E4%BD%BF%E7%94%A8/</url>
-    <content><![CDATA[<h2 id="MySql-FIND-IN-SET-函数的使用"><a href="#MySql-FIND-IN-SET-函数的使用" class="headerlink" title="MySql FIND_IN_SET()函数的使用"></a>MySql FIND_IN_SET()函数的使用</h2><p>前言：最近在做项目时，涉及到一个场景：我有当前用户的id，想查询它是否在一个list中，list长这样：[1,3,4]，后来又变成了这样：1,3,4，原因我们下面详谈</p>
-<a id="more"></a>
-
-<p>原本信誓旦旦的以为将这个list进行处理后就可以用<strong>IN</strong>关键字来查询，后来发现并不行，因此就引入到了<strong>FIND_IN_SET</strong></p>
-<h3 id="1-认识find-in-set-函数"><a href="#1-认识find-in-set-函数" class="headerlink" title="1. 认识find_in_set()函数"></a>1. 认识find_in_set()函数</h3><p>语法：FIND_IN_SET(str,strList)</p>
-<blockquote>
-<p>假如字符串str在由N个子链组成的字符串列表strlist 中，则返回值的范围在 1 到 N 之间。 一个字符串列表就是一个由一些被 ‘,’ 符号分开的子链组成的字符串。如果第一个参数是一个常数字符串，而第二个是type SET列，则FIND_IN_SET() 函数被优化，使用比特计算。 如果str不在strlist 或strlist 为空字符串，则返回值为 0 。如任意一个参数为NULL，则返回值为 NULL。这个函数在第一个参数包含一个逗号(‘,’)时将无法正常运行。</p>
-</blockquote>
-<p>相信很多学过mysql的伙伴都觉得自己sql语句已经掌握的炉火纯青了，但是看到这个find_in_set()，你是否又懵了呢，没关系，我们一起来认识一下它。</p>
-<p>上面这一段是官方文档给出来的解释，乍一看可能看不明白，今天我们就来剖析一下。</p>
-<h3 id="2-基础用法"><a href="#2-基础用法" class="headerlink" title="2. 基础用法"></a>2. 基础用法</h3><h4 id="例子1"><a href="#例子1" class="headerlink" title="例子1"></a>例子1</h4><p><img src="https://img-blog.csdnimg.cn/20201118214336718.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<p>不难看出find_in_set的作用就是查询指定str字符在一组固定的字符串序列中的位置，第一个结果为2，因为<strong>2</strong>在strlist中放在第二个位置，并且起始数是从1开始算起的！，第二个结果显然是0，因为字符集中并不存在5。</p>
-<h4 id="例子2"><a href="#例子2" class="headerlink" title="例子2"></a>例子2</h4><p>将find_in_set带入到我们实际的应用中，进行查询整张表的时候，一次返回多条记录的情况</p>
-<p>比如说：id是某一个表的主键字段，然后每条记录分别是id等于1，2，3，4，5的时候, 就有点类似in() 的操作了</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select * from work where find_in_set(id,&#39;2,3,4,5,6&#39;);</span><br></pre></td></tr></table></figure>
-
-<p>结果会是这样，如下图</p>
-<p> <img src="https://img-blog.csdnimg.cn/20201118214336728.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<p>其实上面的sql语句也等于下面的in</p>
-<p><img src="https://img-blog.csdnimg.cn/20201118214336724.png#pic_center"></p>
-<h3 id="3-find-in-set-与in-的应用场景以及区别"><a href="#3-find-in-set-与in-的应用场景以及区别" class="headerlink" title="3. find_in_set()与in()的应用场景以及区别"></a>3. find_in_set()与in()的应用场景以及区别</h3><p>刚才我们也看到了</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select * from user where find_in_set(id, &#39;2,3,4,5&#39;);</span><br><span class="line">与</span><br><span class="line">select * from user where id in(2,3,4,5);</span><br></pre></td></tr></table></figure>
-
-<p>两条SQL的结果是一样的，但其实还是有一点小区别的。</p>
-<p>区别就在于 一个由单引号而另一个没有单引号这里也要针对你所检测的字段是数字类型 还是字符串类型的字段！</p>
-<p><strong>对于find_in_set()而言</strong></p>
-<p>第二个参数无论是字符串还是数字都必须用单引号括起来，并且字符串列表是用逗号隔开,是一个字符串列表整体要是不这样写 会报语法错误！</p>
-<p><strong>对于in()而言</strong></p>
-<p>如果是检测的字段如果是数字类型的话就不能用单引号，因为这样会让结果出现偏差</p>
-<p><strong>注意：这里有一个小坑，害我不浅，记录一下。</strong></p>
-<p>在使用find_in_set()时，第二个参数中的字符集是用逗号隔开的，恰好自己又是个手残党，习惯性的在每个逗号后面多跟了一个不起眼的<strong>空格</strong>，此时它只会查询到字符集中的第一个字符串，后面的所有str都会被忽略，不信你看。</p>
-<p><img src="https://img-blog.csdnimg.cn/20201118214336687.png#pic_center"></p>
-<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><ol>
-<li>如果待查询的条件是<strong>常量(字段)**那就使用</strong>in<strong>，是</strong>变量(不确定值)<strong>则使用</strong>FIND_IN_SET**。</li>
-<li>如果使用<strong>IN</strong>和<strong>FIND_IN_SET</strong>都能满足条件，则最好使用<strong>IN</strong>，特别是查询字段为主键时或有索引时。</li>
-<li>如果使用<strong>IN</strong>不能满足功能需求，那只能使用<strong>FIND_IN_SET</strong>了。</li>
-</ol>
 ]]></content>
   </entry>
   <entry>
@@ -377,6 +335,48 @@
 </ol>
 </li>
 </ul>
+]]></content>
+  </entry>
+  <entry>
+    <title>MySql FIND_IN_SET()函数的使用</title>
+    <url>/2020/07/21/FIND-IN-SET-%E5%87%BD%E6%95%B0%E7%9A%84%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[<h2 id="MySql-FIND-IN-SET-函数的使用"><a href="#MySql-FIND-IN-SET-函数的使用" class="headerlink" title="MySql FIND_IN_SET()函数的使用"></a>MySql FIND_IN_SET()函数的使用</h2><p>前言：最近在做项目时，涉及到一个场景：我有当前用户的id，想查询它是否在一个list中，list长这样：[1,3,4]，后来又变成了这样：1,3,4，原因我们下面详谈</p>
+<a id="more"></a>
+
+<p>原本信誓旦旦的以为将这个list进行处理后就可以用<strong>IN</strong>关键字来查询，后来发现并不行，因此就引入到了<strong>FIND_IN_SET</strong></p>
+<h3 id="1-认识find-in-set-函数"><a href="#1-认识find-in-set-函数" class="headerlink" title="1. 认识find_in_set()函数"></a>1. 认识find_in_set()函数</h3><p>语法：FIND_IN_SET(str,strList)</p>
+<blockquote>
+<p>假如字符串str在由N个子链组成的字符串列表strlist 中，则返回值的范围在 1 到 N 之间。 一个字符串列表就是一个由一些被 ‘,’ 符号分开的子链组成的字符串。如果第一个参数是一个常数字符串，而第二个是type SET列，则FIND_IN_SET() 函数被优化，使用比特计算。 如果str不在strlist 或strlist 为空字符串，则返回值为 0 。如任意一个参数为NULL，则返回值为 NULL。这个函数在第一个参数包含一个逗号(‘,’)时将无法正常运行。</p>
+</blockquote>
+<p>相信很多学过mysql的伙伴都觉得自己sql语句已经掌握的炉火纯青了，但是看到这个find_in_set()，你是否又懵了呢，没关系，我们一起来认识一下它。</p>
+<p>上面这一段是官方文档给出来的解释，乍一看可能看不明白，今天我们就来剖析一下。</p>
+<h3 id="2-基础用法"><a href="#2-基础用法" class="headerlink" title="2. 基础用法"></a>2. 基础用法</h3><h4 id="例子1"><a href="#例子1" class="headerlink" title="例子1"></a>例子1</h4><p><img src="https://img-blog.csdnimg.cn/20201118214336718.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<p>不难看出find_in_set的作用就是查询指定str字符在一组固定的字符串序列中的位置，第一个结果为2，因为<strong>2</strong>在strlist中放在第二个位置，并且起始数是从1开始算起的！，第二个结果显然是0，因为字符集中并不存在5。</p>
+<h4 id="例子2"><a href="#例子2" class="headerlink" title="例子2"></a>例子2</h4><p>将find_in_set带入到我们实际的应用中，进行查询整张表的时候，一次返回多条记录的情况</p>
+<p>比如说：id是某一个表的主键字段，然后每条记录分别是id等于1，2，3，4，5的时候, 就有点类似in() 的操作了</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select * from work where find_in_set(id,&#39;2,3,4,5,6&#39;);</span><br></pre></td></tr></table></figure>
+
+<p>结果会是这样，如下图</p>
+<p> <img src="https://img-blog.csdnimg.cn/20201118214336728.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<p>其实上面的sql语句也等于下面的in</p>
+<p><img src="https://img-blog.csdnimg.cn/20201118214336724.png#pic_center"></p>
+<h3 id="3-find-in-set-与in-的应用场景以及区别"><a href="#3-find-in-set-与in-的应用场景以及区别" class="headerlink" title="3. find_in_set()与in()的应用场景以及区别"></a>3. find_in_set()与in()的应用场景以及区别</h3><p>刚才我们也看到了</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select * from user where find_in_set(id, &#39;2,3,4,5&#39;);</span><br><span class="line">与</span><br><span class="line">select * from user where id in(2,3,4,5);</span><br></pre></td></tr></table></figure>
+
+<p>两条SQL的结果是一样的，但其实还是有一点小区别的。</p>
+<p>区别就在于 一个由单引号而另一个没有单引号这里也要针对你所检测的字段是数字类型 还是字符串类型的字段！</p>
+<p><strong>对于find_in_set()而言</strong></p>
+<p>第二个参数无论是字符串还是数字都必须用单引号括起来，并且字符串列表是用逗号隔开,是一个字符串列表整体要是不这样写 会报语法错误！</p>
+<p><strong>对于in()而言</strong></p>
+<p>如果是检测的字段如果是数字类型的话就不能用单引号，因为这样会让结果出现偏差</p>
+<p><strong>注意：这里有一个小坑，害我不浅，记录一下。</strong></p>
+<p>在使用find_in_set()时，第二个参数中的字符集是用逗号隔开的，恰好自己又是个手残党，习惯性的在每个逗号后面多跟了一个不起眼的<strong>空格</strong>，此时它只会查询到字符集中的第一个字符串，后面的所有str都会被忽略，不信你看。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201118214336687.png#pic_center"></p>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><ol>
+<li>如果待查询的条件是<strong>常量(字段)**那就使用</strong>in<strong>，是</strong>变量(不确定值)<strong>则使用</strong>FIND_IN_SET**。</li>
+<li>如果使用<strong>IN</strong>和<strong>FIND_IN_SET</strong>都能满足条件，则最好使用<strong>IN</strong>，特别是查询字段为主键时或有索引时。</li>
+<li>如果使用<strong>IN</strong>不能满足功能需求，那只能使用<strong>FIND_IN_SET</strong>了。</li>
+</ol>
 ]]></content>
   </entry>
   <entry>
@@ -571,48 +571,6 @@
       </tags>
   </entry>
   <entry>
-    <title>celery介绍</title>
-    <url>/2019/11/20/celery%E4%BB%8B%E7%BB%8D/</url>
-    <content><![CDATA[<h2 id="1-celery介绍"><a href="#1-celery介绍" class="headerlink" title="1. celery介绍"></a>1. celery介绍</h2><h4 id="1-1-celery应用举例"><a href="#1-1-celery应用举例" class="headerlink" title="1.1 celery应用举例"></a>1.1 celery应用举例</h4><ul>
-<li>Celery 是一个 基于python开发的分布式异步消息任务队列，通过它可以轻松的实现任务的异步处理，如果你的业务场景中需要用到异步任务，就可以考虑使用celery</li>
-</ul>
-<a id="more"></a>
-
-<ul>
-<li>你想对100台机器执行一条批量命令，可能会花很长时间 ，但你不想让你的程序等着结果返回，而是给你返回 一个任务ID,你过一段时间只需要拿着这个任务id就可以拿到任务执行结果， 在任务执行ing进行时，你可以继续做其它的事情</li>
-<li>Celery 在执行任务时需要通过一个消息中间件来接收和发送任务消息，以及存储任务结果， 一般使用rabbitMQ or Redis</li>
-</ul>
-<h4 id="1-2-celery优点"><a href="#1-2-celery优点" class="headerlink" title="1.2 celery优点"></a>1.2 celery优点</h4><ul>
-<li>简单：一旦熟悉了celery的工作流程后，配置和使用还是比较简单的</li>
-<li>高可用：当任务执行失败或执行过程中发生连接中断，celery会自动尝试重新执行任务</li>
-<li>快速：一个单进程的celery每分钟可处理上百万个任务</li>
-<li>灵活：几乎celery的各个组件都可以被扩展及自定制</li>
-</ul>
-<h4 id="1-3-celery特性"><a href="#1-3-celery特性" class="headerlink" title="1.3 celery特性"></a>1.3 celery特性</h4><ul>
-<li>方便查看定时任务的执行情况，如：是否成功，当前状态，执行任务花费的时间等</li>
-<li>可选 多进程，Eventlet 和 Gevent 三种模型并发执行</li>
-<li>celery是语言无关的，它提供了python等常见语言的接口支持</li>
-</ul>
-<h2 id="2-celery组件"><a href="#2-celery组件" class="headerlink" title="2.celery组件"></a>2.celery组件</h2><h4 id="2-1-celery扮演生产者和消费者的角色"><a href="#2-1-celery扮演生产者和消费者的角色" class="headerlink" title="2.1 celery扮演生产者和消费者的角色"></a>2.1 celery扮演生产者和消费者的角色</h4><ul>
-<li><strong>Celery Beat :</strong> 任务调度器. Beat 进程会读取配置文件的内容, 周期性的将配置中到期需要执行的任务发送给任务队列.</li>
-<li><strong>Celery Worker :</strong> 执行任务的消费者, 通常会在多台服务器运行多个消费者, 提高运行效率.</li>
-<li><strong>Broker :</strong> 消息代理, 队列本身. 也称为消息中间件. 接受任务生产者发送过来的任务消息, 存进队列再按序分发给任务消费方(通常是消息队列或者数据库).</li>
-<li><strong>Producer :</strong> 任务生产者. 调用 Celery API , 函数或者装饰器, 而产生任务并交给任务队列处理的都是任务生产者.</li>
-<li><strong>Result Backend :</strong> 任务处理完成之后保存状态信息和结果, 以供查询.</li>
-</ul>
-<h4 id="2-2-celery架构图"><a href="#2-2-celery架构图" class="headerlink" title="2.2 celery架构图"></a>2.2 celery架构图</h4><p><img src="https://img-blog.csdnimg.cn/20201207234930510.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<h4 id="2-3-产生任务的方式"><a href="#2-3-产生任务的方式" class="headerlink" title="2.3 产生任务的方式"></a>2.3 产生任务的方式</h4><ol>
-<li>发布者发布任务(WEB 应用)</li>
-<li>任务调度按期发布任务(定时任务)</li>
-</ol>
-<h4 id="2-4-celery-依赖三个库-这三个库-都由-Celery-的开发者开发和维护"><a href="#2-4-celery-依赖三个库-这三个库-都由-Celery-的开发者开发和维护" class="headerlink" title="2.4 celery 依赖三个库: 这三个库, 都由 Celery 的开发者开发和维护."></a>2.4 celery 依赖三个库: 这三个库, 都由 Celery 的开发者开发和维护.</h4><ol>
-<li><strong>billiard</strong> ：基于 Python2.7 的 multisuprocessing 而改进的库, 主要用来提高性能和稳定性.</li>
-<li><strong>librabbitmp</strong>：C语言实现的Python客户端</li>
-<li><strong>kombu</strong>：Celery自带的用来收发消息的库，提供了符合 Python 语言习惯的, 使用 AMQP 协议的高级接口.</li>
-</ol>
-]]></content>
-  </entry>
-  <entry>
     <title>自学测试day01-02</title>
     <url>/2021/09/22/day01-02/</url>
     <content><![CDATA[<h1 id="day01"><a href="#day01" class="headerlink" title="day01"></a>day01</h1><h3 id="软件的定义"><a href="#软件的定义" class="headerlink" title="软件的定义"></a>软件的定义</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">是一系列按照特定顺序组织的计算机数据和指令的集合</span><br></pre></td></tr></table></figure>
@@ -659,53 +617,45 @@
 ]]></content>
   </entry>
   <entry>
-    <title>自学测试day05</title>
-    <url>/2021/09/23/day05/</url>
-    <content><![CDATA[<h1 id="day05"><a href="#day05" class="headerlink" title="day05"></a>day05</h1><h2 id="1-测试用例（test-case）"><a href="#1-测试用例（test-case）" class="headerlink" title="1.测试用例（test case）"></a>1.测试用例（test case）</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">设计测试用例的方法：等价类划分法，边界值分析法，场景法，正交实验法，错误推测，因果图，判定表</span><br></pre></td></tr></table></figure>
+    <title>celery介绍</title>
+    <url>/2019/11/20/celery%E4%BB%8B%E7%BB%8D/</url>
+    <content><![CDATA[<h2 id="1-celery介绍"><a href="#1-celery介绍" class="headerlink" title="1. celery介绍"></a>1. celery介绍</h2><h4 id="1-1-celery应用举例"><a href="#1-1-celery应用举例" class="headerlink" title="1.1 celery应用举例"></a>1.1 celery应用举例</h4><ul>
+<li>Celery 是一个 基于python开发的分布式异步消息任务队列，通过它可以轻松的实现任务的异步处理，如果你的业务场景中需要用到异步任务，就可以考虑使用celery</li>
+</ul>
+<a id="more"></a>
 
-
-
-<h3 id="1-1场景法定义"><a href="#1-1场景法定义" class="headerlink" title="1.1场景法定义"></a>1.1场景法定义</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">为某个业务目标，而编制的一组由测试输入，执行条件以及预期结果组成的案例</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-2用例的核心元素（16个）"><a href="#1-2用例的核心元素（16个）" class="headerlink" title="1.2用例的核心元素（16个）"></a>1.2用例的核心元素（16个）</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.用例编号:  产品型号-文件类型-版本号-序号</span><br><span class="line">2.所属模块：	</span><br><span class="line">3.用例标题：一看到标题就能大概猜到这条用例在测试什么(谁在什么情况下 去做什么 最后结果是什么)</span><br><span class="line">4.优先级：	</span><br><span class="line">5.前置条件：	在做这个测试之前必须要先做的事情（查看他点赞的东西，前提必须先登录他的号）</span><br><span class="line">6.操作步骤：</span><br><span class="line">7.测试数据：</span><br><span class="line">8.预期结果：	有前提条件&#x2F;操作步骤&#x2F;测试数据，预期结果就知道了，预期结果是应该得出的正确结果</span><br><span class="line">9.实际结果：	测试后得到的结果，可能与预期结果不同</span><br><span class="line">10.了解内容： 通过否</span><br><span class="line">11.bugID:</span><br><span class="line">12.编写人员： </span><br><span class="line">13.编写时间：</span><br><span class="line">14.测试人员：</span><br><span class="line">15.测试时间：</span><br><span class="line">16.备注：</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-3提取测试点"><a href="#1-3提取测试点" class="headerlink" title="1.3提取测试点"></a>1.3提取测试点</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">一个一个需要分析测试的地方</span><br><span class="line">一个测试点有可能会有多条测试用例，一个用例只测试一个测试点</span><br><span class="line">每一个和用户交互的地方都是测试点</span><br><span class="line">可以画业务流程图，流程图的每一个步骤都是测试点</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-4等价类划分法"><a href="#1-4等价类划分法" class="headerlink" title="1.4等价类划分法"></a>1.4等价类划分法</h3><h4 id="1-4-1定义"><a href="#1-4-1定义" class="headerlink" title="1.4.1定义"></a>1.4.1定义</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">把可能输入的数据分为若干个区域，然后从每个区域中取少量有代表性的数据</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-4-2分类"><a href="#1-4-2分类" class="headerlink" title="1.4.2分类"></a>1.4.2分类</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">有效等价类： 符合《需求规格说明书》，输入合理的数据集合</span><br><span class="line">无效等价类：不符合《需求规格说明书》，输入不合理的数据集合</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-4-3类型"><a href="#1-4-3类型" class="headerlink" title="1.4.3类型"></a>1.4.3类型</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">取值范围型：学生成绩0-100</span><br><span class="line">恒等类型：只有一个结果是正确的，其他</span><br><span class="line">布尔值型： true false</span><br><span class="line">枚举类型： (&#39;&#39;,&#39;&#39;)</span><br><span class="line">规则类型： 给定要求</span><br><span class="line">字符类型：中文、英文、特殊字符、空格、数字</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-4-4案例"><a href="#1-4-4案例" class="headerlink" title="1.4.4案例"></a>1.4.4案例</h4><h5 id="案例一："><a href="#案例一：" class="headerlink" title="案例一："></a>案例一：</h5><p><img src="/case/day05_img02.jpg"></p>
-<p>划分等价类并编号,下表为等价类划分的结果</p>
-<p><img src="/case/day05_img03.jpg"></p>
-<h5 id="案例二："><a href="#案例二：" class="headerlink" title="案例二："></a>案例二：</h5><p><img src="/case/day05_img04.jpg"></p>
-<h3 id="1-5边界值分析法"><a href="#1-5边界值分析法" class="headerlink" title="1.5边界值分析法"></a>1.5边界值分析法</h3><h4 id="1-5-1定义"><a href="#1-5-1定义" class="headerlink" title="1.5.1定义"></a>1.5.1定义</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">边界值分析是取稍高于或稍低于边界的一些数据进行测试。</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-5-2原因"><a href="#1-5-2原因" class="headerlink" title="1.5.2原因"></a>1.5.2原因</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">程序开发循环体时的取数可能会因为&lt;,&lt;&#x3D;搞错。</span><br><span class="line">8到10岁（含8岁和10岁）：8&lt;&#x3D;age&lt;10 	[8,10]</span><br><span class="line">8到10岁（不含8岁和10岁）：8&lt;age&lt;&#x3D;10	(8,10]	左开右闭</span><br><span class="line">8到10岁（含8岁和不含10岁）：8&lt;&#x3D;age&lt;10	[8,10)	左闭右开</span><br><span class="line">8到10岁（不含8岁和不含10岁）：8&lt;age&lt;10 (8,10)</span><br><span class="line"></span><br><span class="line">[]是闭 ()是开</span><br><span class="line">开区间：不包含等于的区域</span><br><span class="line">闭区间：包含等于的区域</span><br><span class="line"></span><br><span class="line">上点：边界上的点8,10</span><br><span class="line">离点：离上点最近的点 （开内闭外）</span><br><span class="line">内点：域内的点9</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="1-5-3确定边界值的方法"><a href="#1-5-3确定边界值的方法" class="headerlink" title="1.5.3确定边界值的方法"></a>1.5.3确定边界值的方法</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">上点：左边是什么值就是左上点，右边是什么值就是右上点，不考虑开闭区间 </span><br><span class="line">离点：离上点最近的点，（开内闭外）</span><br><span class="line">内点：域内的任意点就是内点</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-<p>1.（1990-1-1 ，今天] 上点内点，离点，有效等价类和无效等价类</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">左上点：1990-1-1</span><br><span class="line">右上点：今天</span><br><span class="line">左离点：1990-1-2</span><br><span class="line">右离点：今天+1天</span><br><span class="line">内点： 1990-1-1&lt;内点&lt;&#x3D;今天</span><br><span class="line"></span><br><span class="line">有效等价类：1990-1-1&lt;有效等价类&lt;&#x3D;今天</span><br><span class="line">无效等价类：无效等价类&#x3D;&lt;1990-1-1 ， 今天&lt;无效等价类</span><br></pre></td></tr></table></figure>
-
-<p>2.边界值讲义案例二</p>
-<p><img src="/case/day05_img04.jpg"></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">第一步：</span><br><span class="line">1.姓名：</span><br><span class="line">	有效等价类： 1&lt;&#x3D; 有效&lt;&#x3D;20（汉字）</span><br><span class="line">	无效等价类： 20&lt;无效，无效&lt;1，非汉字，空值，空格，特殊字符    </span><br><span class="line">	(边界值分析)：分析出为[1,20]</span><br><span class="line">		上点：1,20</span><br><span class="line">		离点：0,21</span><br><span class="line">		内点：1&lt;&#x3D;内点&lt;&#x3D;20</span><br><span class="line"></span><br><span class="line">2.身份证号：</span><br><span class="line">	有效等价类：15,18，14位纯数字+X，17位纯数字+X</span><br><span class="line">	无效等价类：：0-14，19-+∞，特殊字符，空值，空格，纯英文字母</span><br><span class="line">	</span><br><span class="line">3.籍贯：</span><br><span class="line">	有效等价类：1&lt;&#x3D;有效&lt;&#x3D;50,(汉字)</span><br><span class="line">	无效等价类：1&gt;无效，50&lt;无效,空值,特殊符号,空格,英文,数字,中+英,中+数,中+英+数,英+数 </span><br><span class="line">	(边界值分析)：分析出为[1,50]</span><br><span class="line">		上点：1,50</span><br><span class="line">		离点：0,51</span><br><span class="line">		内点：1&lt;&#x3D;内点&lt;&#x3D;50</span><br><span class="line"></span><br><span class="line">4.出生年月：</span><br><span class="line">	有效等价类：1900-1-1&lt;&#x3D;有效&lt;&#x3D;2019-1-1</span><br><span class="line">	无效等价类：1900-1-1&gt;无效 ，2019-1-1&lt;无效</span><br><span class="line">	(边界值分析)：分析出为[1900-1-1,2019-1-1]</span><br><span class="line">		上点：1900-1-1,2019-1-1</span><br><span class="line">		离点：1899-12-31,2019-1-2</span><br><span class="line">		内点：1900-1-1&lt;&#x3D;内点&lt;&#x3D;2019-1-1</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">第二步：</span><br><span class="line">1.身份证正面：</span><br><span class="line">	有效等价类：5M以内，结尾为jpg,png</span><br><span class="line">	无效等价类：1). 5M以外，结尾为jpg,png</span><br><span class="line">			  2). 5M以内，结尾不为Jpg,png</span><br><span class="line">			  3). 5M以外，结尾不为jpg,png</span><br><span class="line">2.身份证反面：</span><br><span class="line">	有效等价类：5M以内，结尾为jpg,png</span><br><span class="line">	无效等价类：1). 5M以外，结尾为jpg,png</span><br><span class="line">			  2). 5M以内，结尾不为Jpg,png</span><br><span class="line">			  3). 5M以外，结尾不为jpg,png</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">第三步：</span><br><span class="line">1.银行卡号</span><br><span class="line">    有效等价类：16位纯数字</span><br><span class="line">    无效等价类：0-15， 大于16，特殊字符，空值，空格，英文字符</span><br><span class="line"></span><br><span class="line">2.开户人姓名</span><br><span class="line">    有效等价类：1-20个汉字（20个汉字以内，默认包含20，非空大于0，从1开始到20）</span><br><span class="line">    无效等价类：大于20个汉字，非汉字，空值，空格，特殊字符</span><br><span class="line"></span><br><span class="line">3.支付金额</span><br><span class="line">    有效等价类：0.01元--全部存款（默认以“元”为单位）</span><br><span class="line">    无效等价类：空值，小于0.01元，英文字母，特殊符号，汉字</span><br></pre></td></tr></table></figure>
-
+<ul>
+<li>你想对100台机器执行一条批量命令，可能会花很长时间 ，但你不想让你的程序等着结果返回，而是给你返回 一个任务ID,你过一段时间只需要拿着这个任务id就可以拿到任务执行结果， 在任务执行ing进行时，你可以继续做其它的事情</li>
+<li>Celery 在执行任务时需要通过一个消息中间件来接收和发送任务消息，以及存储任务结果， 一般使用rabbitMQ or Redis</li>
+</ul>
+<h4 id="1-2-celery优点"><a href="#1-2-celery优点" class="headerlink" title="1.2 celery优点"></a>1.2 celery优点</h4><ul>
+<li>简单：一旦熟悉了celery的工作流程后，配置和使用还是比较简单的</li>
+<li>高可用：当任务执行失败或执行过程中发生连接中断，celery会自动尝试重新执行任务</li>
+<li>快速：一个单进程的celery每分钟可处理上百万个任务</li>
+<li>灵活：几乎celery的各个组件都可以被扩展及自定制</li>
+</ul>
+<h4 id="1-3-celery特性"><a href="#1-3-celery特性" class="headerlink" title="1.3 celery特性"></a>1.3 celery特性</h4><ul>
+<li>方便查看定时任务的执行情况，如：是否成功，当前状态，执行任务花费的时间等</li>
+<li>可选 多进程，Eventlet 和 Gevent 三种模型并发执行</li>
+<li>celery是语言无关的，它提供了python等常见语言的接口支持</li>
+</ul>
+<h2 id="2-celery组件"><a href="#2-celery组件" class="headerlink" title="2.celery组件"></a>2.celery组件</h2><h4 id="2-1-celery扮演生产者和消费者的角色"><a href="#2-1-celery扮演生产者和消费者的角色" class="headerlink" title="2.1 celery扮演生产者和消费者的角色"></a>2.1 celery扮演生产者和消费者的角色</h4><ul>
+<li><strong>Celery Beat :</strong> 任务调度器. Beat 进程会读取配置文件的内容, 周期性的将配置中到期需要执行的任务发送给任务队列.</li>
+<li><strong>Celery Worker :</strong> 执行任务的消费者, 通常会在多台服务器运行多个消费者, 提高运行效率.</li>
+<li><strong>Broker :</strong> 消息代理, 队列本身. 也称为消息中间件. 接受任务生产者发送过来的任务消息, 存进队列再按序分发给任务消费方(通常是消息队列或者数据库).</li>
+<li><strong>Producer :</strong> 任务生产者. 调用 Celery API , 函数或者装饰器, 而产生任务并交给任务队列处理的都是任务生产者.</li>
+<li><strong>Result Backend :</strong> 任务处理完成之后保存状态信息和结果, 以供查询.</li>
+</ul>
+<h4 id="2-2-celery架构图"><a href="#2-2-celery架构图" class="headerlink" title="2.2 celery架构图"></a>2.2 celery架构图</h4><p><img src="https://img-blog.csdnimg.cn/20201207234930510.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<h4 id="2-3-产生任务的方式"><a href="#2-3-产生任务的方式" class="headerlink" title="2.3 产生任务的方式"></a>2.3 产生任务的方式</h4><ol>
+<li>发布者发布任务(WEB 应用)</li>
+<li>任务调度按期发布任务(定时任务)</li>
+</ol>
+<h4 id="2-4-celery-依赖三个库-这三个库-都由-Celery-的开发者开发和维护"><a href="#2-4-celery-依赖三个库-这三个库-都由-Celery-的开发者开发和维护" class="headerlink" title="2.4 celery 依赖三个库: 这三个库, 都由 Celery 的开发者开发和维护."></a>2.4 celery 依赖三个库: 这三个库, 都由 Celery 的开发者开发和维护.</h4><ol>
+<li><strong>billiard</strong> ：基于 Python2.7 的 multisuprocessing 而改进的库, 主要用来提高性能和稳定性.</li>
+<li><strong>librabbitmp</strong>：C语言实现的Python客户端</li>
+<li><strong>kombu</strong>：Celery自带的用来收发消息的库，提供了符合 Python 语言习惯的, 使用 AMQP 协议的高级接口.</li>
+</ol>
 ]]></content>
   </entry>
   <entry>
@@ -915,6 +865,56 @@
 ]]></content>
   </entry>
   <entry>
+    <title>自学测试day05</title>
+    <url>/2021/09/23/day05/</url>
+    <content><![CDATA[<h1 id="day05"><a href="#day05" class="headerlink" title="day05"></a>day05</h1><h2 id="1-测试用例（test-case）"><a href="#1-测试用例（test-case）" class="headerlink" title="1.测试用例（test case）"></a>1.测试用例（test case）</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">设计测试用例的方法：等价类划分法，边界值分析法，场景法，正交实验法，错误推测，因果图，判定表</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="1-1场景法定义"><a href="#1-1场景法定义" class="headerlink" title="1.1场景法定义"></a>1.1场景法定义</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">为某个业务目标，而编制的一组由测试输入，执行条件以及预期结果组成的案例</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2用例的核心元素（16个）"><a href="#1-2用例的核心元素（16个）" class="headerlink" title="1.2用例的核心元素（16个）"></a>1.2用例的核心元素（16个）</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.用例编号:  产品型号-文件类型-版本号-序号</span><br><span class="line">2.所属模块：	</span><br><span class="line">3.用例标题：一看到标题就能大概猜到这条用例在测试什么(谁在什么情况下 去做什么 最后结果是什么)</span><br><span class="line">4.优先级：	</span><br><span class="line">5.前置条件：	在做这个测试之前必须要先做的事情（查看他点赞的东西，前提必须先登录他的号）</span><br><span class="line">6.操作步骤：</span><br><span class="line">7.测试数据：</span><br><span class="line">8.预期结果：	有前提条件&#x2F;操作步骤&#x2F;测试数据，预期结果就知道了，预期结果是应该得出的正确结果</span><br><span class="line">9.实际结果：	测试后得到的结果，可能与预期结果不同</span><br><span class="line">10.了解内容： 通过否</span><br><span class="line">11.bugID:</span><br><span class="line">12.编写人员： </span><br><span class="line">13.编写时间：</span><br><span class="line">14.测试人员：</span><br><span class="line">15.测试时间：</span><br><span class="line">16.备注：</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3提取测试点"><a href="#1-3提取测试点" class="headerlink" title="1.3提取测试点"></a>1.3提取测试点</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">一个一个需要分析测试的地方</span><br><span class="line">一个测试点有可能会有多条测试用例，一个用例只测试一个测试点</span><br><span class="line">每一个和用户交互的地方都是测试点</span><br><span class="line">可以画业务流程图，流程图的每一个步骤都是测试点</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4等价类划分法"><a href="#1-4等价类划分法" class="headerlink" title="1.4等价类划分法"></a>1.4等价类划分法</h3><h4 id="1-4-1定义"><a href="#1-4-1定义" class="headerlink" title="1.4.1定义"></a>1.4.1定义</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">把可能输入的数据分为若干个区域，然后从每个区域中取少量有代表性的数据</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-4-2分类"><a href="#1-4-2分类" class="headerlink" title="1.4.2分类"></a>1.4.2分类</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">有效等价类： 符合《需求规格说明书》，输入合理的数据集合</span><br><span class="line">无效等价类：不符合《需求规格说明书》，输入不合理的数据集合</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-4-3类型"><a href="#1-4-3类型" class="headerlink" title="1.4.3类型"></a>1.4.3类型</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">取值范围型：学生成绩0-100</span><br><span class="line">恒等类型：只有一个结果是正确的，其他</span><br><span class="line">布尔值型： true false</span><br><span class="line">枚举类型： (&#39;&#39;,&#39;&#39;)</span><br><span class="line">规则类型： 给定要求</span><br><span class="line">字符类型：中文、英文、特殊字符、空格、数字</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-4-4案例"><a href="#1-4-4案例" class="headerlink" title="1.4.4案例"></a>1.4.4案例</h4><h5 id="案例一："><a href="#案例一：" class="headerlink" title="案例一："></a>案例一：</h5><p><img src="/case/day05_img02.jpg"></p>
+<p>划分等价类并编号,下表为等价类划分的结果</p>
+<p><img src="/case/day05_img03.jpg"></p>
+<h5 id="案例二："><a href="#案例二：" class="headerlink" title="案例二："></a>案例二：</h5><p><img src="/case/day05_img04.jpg"></p>
+<h3 id="1-5边界值分析法"><a href="#1-5边界值分析法" class="headerlink" title="1.5边界值分析法"></a>1.5边界值分析法</h3><h4 id="1-5-1定义"><a href="#1-5-1定义" class="headerlink" title="1.5.1定义"></a>1.5.1定义</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">边界值分析是取稍高于或稍低于边界的一些数据进行测试。</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-5-2原因"><a href="#1-5-2原因" class="headerlink" title="1.5.2原因"></a>1.5.2原因</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">程序开发循环体时的取数可能会因为&lt;,&lt;&#x3D;搞错。</span><br><span class="line">8到10岁（含8岁和10岁）：8&lt;&#x3D;age&lt;10 	[8,10]</span><br><span class="line">8到10岁（不含8岁和10岁）：8&lt;age&lt;&#x3D;10	(8,10]	左开右闭</span><br><span class="line">8到10岁（含8岁和不含10岁）：8&lt;&#x3D;age&lt;10	[8,10)	左闭右开</span><br><span class="line">8到10岁（不含8岁和不含10岁）：8&lt;age&lt;10 (8,10)</span><br><span class="line"></span><br><span class="line">[]是闭 ()是开</span><br><span class="line">开区间：不包含等于的区域</span><br><span class="line">闭区间：包含等于的区域</span><br><span class="line"></span><br><span class="line">上点：边界上的点8,10</span><br><span class="line">离点：离上点最近的点 （开内闭外）</span><br><span class="line">内点：域内的点9</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-5-3确定边界值的方法"><a href="#1-5-3确定边界值的方法" class="headerlink" title="1.5.3确定边界值的方法"></a>1.5.3确定边界值的方法</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">上点：左边是什么值就是左上点，右边是什么值就是右上点，不考虑开闭区间 </span><br><span class="line">离点：离上点最近的点，（开内闭外）</span><br><span class="line">内点：域内的任意点就是内点</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>1.（1990-1-1 ，今天] 上点内点，离点，有效等价类和无效等价类</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">左上点：1990-1-1</span><br><span class="line">右上点：今天</span><br><span class="line">左离点：1990-1-2</span><br><span class="line">右离点：今天+1天</span><br><span class="line">内点： 1990-1-1&lt;内点&lt;&#x3D;今天</span><br><span class="line"></span><br><span class="line">有效等价类：1990-1-1&lt;有效等价类&lt;&#x3D;今天</span><br><span class="line">无效等价类：无效等价类&#x3D;&lt;1990-1-1 ， 今天&lt;无效等价类</span><br></pre></td></tr></table></figure>
+
+<p>2.边界值讲义案例二</p>
+<p><img src="/case/day05_img04.jpg"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">第一步：</span><br><span class="line">1.姓名：</span><br><span class="line">	有效等价类： 1&lt;&#x3D; 有效&lt;&#x3D;20（汉字）</span><br><span class="line">	无效等价类： 20&lt;无效，无效&lt;1，非汉字，空值，空格，特殊字符    </span><br><span class="line">	(边界值分析)：分析出为[1,20]</span><br><span class="line">		上点：1,20</span><br><span class="line">		离点：0,21</span><br><span class="line">		内点：1&lt;&#x3D;内点&lt;&#x3D;20</span><br><span class="line"></span><br><span class="line">2.身份证号：</span><br><span class="line">	有效等价类：15,18，14位纯数字+X，17位纯数字+X</span><br><span class="line">	无效等价类：：0-14，19-+∞，特殊字符，空值，空格，纯英文字母</span><br><span class="line">	</span><br><span class="line">3.籍贯：</span><br><span class="line">	有效等价类：1&lt;&#x3D;有效&lt;&#x3D;50,(汉字)</span><br><span class="line">	无效等价类：1&gt;无效，50&lt;无效,空值,特殊符号,空格,英文,数字,中+英,中+数,中+英+数,英+数 </span><br><span class="line">	(边界值分析)：分析出为[1,50]</span><br><span class="line">		上点：1,50</span><br><span class="line">		离点：0,51</span><br><span class="line">		内点：1&lt;&#x3D;内点&lt;&#x3D;50</span><br><span class="line"></span><br><span class="line">4.出生年月：</span><br><span class="line">	有效等价类：1900-1-1&lt;&#x3D;有效&lt;&#x3D;2019-1-1</span><br><span class="line">	无效等价类：1900-1-1&gt;无效 ，2019-1-1&lt;无效</span><br><span class="line">	(边界值分析)：分析出为[1900-1-1,2019-1-1]</span><br><span class="line">		上点：1900-1-1,2019-1-1</span><br><span class="line">		离点：1899-12-31,2019-1-2</span><br><span class="line">		内点：1900-1-1&lt;&#x3D;内点&lt;&#x3D;2019-1-1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">第二步：</span><br><span class="line">1.身份证正面：</span><br><span class="line">	有效等价类：5M以内，结尾为jpg,png</span><br><span class="line">	无效等价类：1). 5M以外，结尾为jpg,png</span><br><span class="line">			  2). 5M以内，结尾不为Jpg,png</span><br><span class="line">			  3). 5M以外，结尾不为jpg,png</span><br><span class="line">2.身份证反面：</span><br><span class="line">	有效等价类：5M以内，结尾为jpg,png</span><br><span class="line">	无效等价类：1). 5M以外，结尾为jpg,png</span><br><span class="line">			  2). 5M以内，结尾不为Jpg,png</span><br><span class="line">			  3). 5M以外，结尾不为jpg,png</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">第三步：</span><br><span class="line">1.银行卡号</span><br><span class="line">    有效等价类：16位纯数字</span><br><span class="line">    无效等价类：0-15， 大于16，特殊字符，空值，空格，英文字符</span><br><span class="line"></span><br><span class="line">2.开户人姓名</span><br><span class="line">    有效等价类：1-20个汉字（20个汉字以内，默认包含20，非空大于0，从1开始到20）</span><br><span class="line">    无效等价类：大于20个汉字，非汉字，空值，空格，特殊字符</span><br><span class="line"></span><br><span class="line">3.支付金额</span><br><span class="line">    有效等价类：0.01元--全部存款（默认以“元”为单位）</span><br><span class="line">    无效等价类：空值，小于0.01元，英文字母，特殊符号，汉字</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
     <title>自学测试day08</title>
     <url>/2021/09/26/day08/</url>
     <content><![CDATA[<h1 id="day08"><a href="#day08" class="headerlink" title="day08"></a>day08</h1><h2 id="1-缺陷报告"><a href="#1-缺陷报告" class="headerlink" title="1.缺陷报告"></a>1.缺陷报告</h2><h3 id="1-1定义"><a href="#1-1定义" class="headerlink" title="1.1定义"></a>1.1定义</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">标识并描述发现的缺陷，具有清晰，完整和可重视问题所需的信息的文档。</span><br><span class="line">测试人员发现缺陷，将缺陷记录在《缺陷报告》中，通过缺陷报告将缺陷告知给开发人员，并对缺陷进行跟踪和管理。缺陷报告是测试人员与开发人员之间重要的沟通方式。</span><br></pre></td></tr></table></figure>
@@ -938,6 +938,57 @@
 
 
 <h3 id="1-8缺陷报告模块"><a href="#1-8缺陷报告模块" class="headerlink" title="1.8缺陷报告模块"></a>1.8缺陷报告模块</h3><p><img src="/case/day08_img05.jpg"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>django+vue实现文件上传</title>
+    <url>/2019/07/08/django-vue%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/</url>
+    <content><![CDATA[<h3 id="上传图片"><a href="#上传图片" class="headerlink" title="上传图片"></a>上传图片</h3><p>利用Django实现文件上传上传，并不困难，下面开始介绍具体的几种方式</p>
+<a id="more"></a>
+
+<p>前端我们使用ant-design组件中的Upload控件实现</p>
+<p>官方文档：<a href="https://www.antdv.com/components/upload-cn/">https://www.antdv.com/components/upload-cn/</a></p>
+<p>下面是我们前端vue需要用到的具体代码，官方已经为我们写好了，我来解释一下具体参数</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;a-upload</span><br><span class="line">    name=<span class="string">&quot;file&quot;</span>			<span class="comment">// 传递到后端的key</span></span><br><span class="line">    :multiple=<span class="string">&quot;true&quot;</span>	<span class="comment">// 异步多个文件上传，true为开启</span></span><br><span class="line">    action=<span class="string">&quot;https://www.mocky.io/v2/5cc8019d300000980a055e76&quot;</span>	<span class="comment">// 代表请求的上传接口</span></span><br><span class="line">    :headers=<span class="string">&quot;headers&quot;</span>	<span class="comment">// 声明文件的头部，在data中定义</span></span><br><span class="line">    @change=<span class="string">&quot;handleChange&quot;</span>	<span class="comment">// 发送请求的方法</span></span><br><span class="line">  &gt;</span><br><span class="line">    &lt;a-button&gt; <span class="xml"><span class="tag">&lt;<span class="name">a-icon</span> <span class="attr">type</span>=<span class="string">&quot;upload&quot;</span> /&gt;</span></span> Click to Upload &lt;/a-button&gt;</span><br><span class="line">  &lt;/a-upload&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        <span class="comment">// 文件头部信息</span></span><br><span class="line">      headers: &#123;</span><br><span class="line">        authorization: <span class="string">&#x27;authorization-text&#x27;</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">handleChange</span>(<span class="params">info</span>)</span> &#123;		<span class="comment">// info：返回值</span></span><br><span class="line">      <span class="keyword">if</span> (info.file.status !== <span class="string">&#x27;uploading&#x27;</span>) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(info.file, info.fileList);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (info.file.status === <span class="string">&#x27;done&#x27;</span>) &#123;		<span class="comment">// 上传成功</span></span><br><span class="line">        <span class="built_in">this</span>.$message.success(<span class="string">`<span class="subst">$&#123;info.file.name&#125;</span> file uploaded successfully`</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (info.file.status === <span class="string">&#x27;error&#x27;</span>) &#123;		<span class="comment">// 上传失败</span></span><br><span class="line">        <span class="built_in">this</span>.$message.error(<span class="string">`<span class="subst">$&#123;info.file.name&#125;</span> file upload failed.`</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-存储为静态文件"><a href="#1-存储为静态文件" class="headerlink" title="1. 存储为静态文件"></a>1. 存储为静态文件</h4><ul>
+<li>前端发送过来的图片，django只需要把图片存放到配置好的静态目录下，并且将图片名存入到数据库中，通过静态路由+图片名就可以直接访问</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UploadFile</span>(<span class="params">View</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 接收参数</span></span><br><span class="line">        img = request.FILES.get(<span class="string">&quot;file&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 建立文件流</span></span><br><span class="line">        f = <span class="built_in">open</span>(os.path.join(UPLOAD_ROOT, <span class="string">&#x27;&#x27;</span>, img.name, ), <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">        <span class="comment"># 写文件</span></span><br><span class="line">        <span class="keyword">for</span> chunk <span class="keyword">in</span> img.chunks():</span><br><span class="line">            f.write(chunk)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 关闭文件流</span></span><br><span class="line">        f.close()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># with open(os.path.join(UPLOAD_ROOT, &#x27;&#x27;, img.name), &#x27;wb&#x27;) as f:</span></span><br><span class="line">        <span class="comment">#     # 写文件</span></span><br><span class="line">        <span class="comment">#     for chunk in img.chunks():</span></span><br><span class="line">        <span class="comment">#         f.write(chunk)</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(&#123;<span class="string">&#x27;filename&#x27;</span>: img.name&#125;, ensure_ascii=<span class="literal">False</span>), content_type=<span class="string">&#x27;application/json&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>注意：在写文件时，可以有两种方式</p>
+<ul>
+<li>建立文件流，使用Python内置的<code>open()</code>函数，传入文件名和标示符，最后使用f.close()关闭文件流，否则会占用内存资源</li>
+<li>with open语句，例如上文，每次建立文件流再关闭实在太繁琐，python引入了with语句来自动帮我们调用close()方法</li>
+</ul>
+<p>补充：img.chunks()：按块返回文件，通过在for循环中进行迭代，可以将大文件按块写入到<br>服务器中；</p>
+<h4 id="2-存储base64编码"><a href="#2-存储base64编码" class="headerlink" title="2. 存储base64编码"></a>2. 存储base64编码</h4><p>首先来了解一下什么是base64，BASE64是一种编码方式，通常用于把二进制数据编码为可写的字符形式的数据。这是一种可逆的编码方式。Base64编码的作用：由于某些系统中只能使用ASCII字符，Base64就是用来将非ASCII字符的数据转换成ASCII字符的一种方法。是一种“防君子不防小人”的编码方式。</p>
+<ul>
+<li>优点：速度快，ascii字符，肉眼不可理解</li>
+<li>编码比较长，非常容易被破解，仅适用于加密非关键信息的场合</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">1</span>).普通字符串编码</span><br><span class="line">s = <span class="string">&quot;我是一个字符串&quot;</span></span><br><span class="line"><span class="comment"># a bytes-like object is required</span></span><br><span class="line">encoder = base64.b64encode(s.encode(<span class="string">&quot;utf-8&quot;</span>))</span><br><span class="line">print(encoder) <span class="comment"># byte类型 b&#x27;5oiR5piv5LiA5Liq5a2X56ym5Liy&#x27;</span></span><br><span class="line"></span><br><span class="line">str_encoder = encoder.decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">print(str_encoder) <span class="comment"># str类型 5oiR5piv5LiA5Liq5a2X56ym5Liy</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解码过程</span></span><br><span class="line">decoder = base64.b64decode(str_encoder)</span><br><span class="line">print(decoder.decode(<span class="string">&#x27;utf-8&#x27;</span>)) <span class="comment"># 我是一个字符串</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">2</span>).图片编码</span><br><span class="line"><span class="comment"># 打开图片用二进制流方法</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;../static/upload/xxx.jpg&#x27;</span>, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="comment"># 读取</span></span><br><span class="line">    data = f.read()</span><br><span class="line">    <span class="comment"># 进行编码</span></span><br><span class="line">    encodestr = base64.b64encode(data)	<span class="comment"># byte类型 b&#x27;5oiR5piv5LiA5Liq5a2X56ym5Liy&#x27;</span></span><br><span class="line">	<span class="comment"># 解码</span></span><br><span class="line">    print(<span class="built_in">str</span>(encodestr), <span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li><p>要在数据库中存储base64时，需要将字段指定为longtext类型</p>
+</li>
+<li><p>base64编码的图片也可以直接在前端展示</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;img src=<span class="string">&quot;data:image/jpg(声明图片后缀);base64,编码&quot;</span> alt=<span class="string">&quot;&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拼接方法：</span></span><br><span class="line"><span class="built_in">this</span>.img_url = <span class="string">&#x27;data:image/&#x27;</span> + <span class="built_in">this</span>.suffix + <span class="string">&#x27;;base64,&#x27;</span> + <span class="built_in">this</span>.b64</span><br><span class="line"></span><br><span class="line"><span class="comment">// avatar头像展示,动态绑定拼接好的base64</span></span><br><span class="line">&lt;a-avatar :src=<span class="string">&quot;img_url&quot;</span> style=<span class="string">&quot;margin-left: 10px;&quot;</span>&gt;&lt;/a-avatar&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="3-上传到云端"><a href="#3-上传到云端" class="headerlink" title="3. 上传到云端"></a>3. 上传到云端</h4><p>企业云盘，可以为企业提供一个集中存储、管理文件的平台，避免文件的分散、无序，避免电脑病毒、硬盘破损等带来的文件丢失，文件分享更便捷，增强办公的协同性。</p>
+<p>常用云端：七牛云、阿里云、又拍云</p>
+<p>以又拍云为例子：</p>
+<p>首先安装又拍云sdk</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">pip install unyun</span><br></pre></td></tr></table></figure>
+
+<p>视图</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> upyun</span><br><span class="line"></span><br><span class="line"><span class="comment">#定义文件上传类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UploadFile</span>(<span class="params">View</span>):</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self,request</span>):</span></span><br><span class="line"></span><br><span class="line">        img = request.FILES.get(<span class="string">&#x27;file&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        up = upyun.UpYun(<span class="string">&#x27;你的空间名称&#x27;</span>, username=<span class="string">&#x27;操作员账号&#x27;</span>, password=<span class="string">&#x27;操作员密码&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        headers = &#123; <span class="string">&#x27;x-gmkerl-rotate&#x27;</span>: <span class="string">&#x27;auto&#x27;</span> &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> chunk <span class="keyword">in</span> img.chunks():</span><br><span class="line">            res = up.put(<span class="string">&#x27;/touxiang1.jpg&#x27;</span>, chunk, checksum=<span class="literal">True</span>, headers=headers)</span><br><span class="line"></span><br><span class="line">        <span class="comment">#返回结果</span></span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(&#123;<span class="string">&#x27;filename&#x27;</span>:img.name&#125;),content_type=<span class="string">&#x27;application/json&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>上传成功的图片可以通过又拍云分配的空间域名+图片名来进行访问</p>
+<p>又拍云上传参考大神技术博客：<a href="https://v3u.cn/a_id_140">https://v3u.cn/a_id_140</a></p>
 ]]></content>
   </entry>
   <entry>
@@ -1182,57 +1233,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>django+vue实现文件上传</title>
-    <url>/2019/07/08/django-vue%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/</url>
-    <content><![CDATA[<h3 id="上传图片"><a href="#上传图片" class="headerlink" title="上传图片"></a>上传图片</h3><p>利用Django实现文件上传上传，并不困难，下面开始介绍具体的几种方式</p>
-<a id="more"></a>
-
-<p>前端我们使用ant-design组件中的Upload控件实现</p>
-<p>官方文档：<a href="https://www.antdv.com/components/upload-cn/">https://www.antdv.com/components/upload-cn/</a></p>
-<p>下面是我们前端vue需要用到的具体代码，官方已经为我们写好了，我来解释一下具体参数</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;a-upload</span><br><span class="line">    name=<span class="string">&quot;file&quot;</span>			<span class="comment">// 传递到后端的key</span></span><br><span class="line">    :multiple=<span class="string">&quot;true&quot;</span>	<span class="comment">// 异步多个文件上传，true为开启</span></span><br><span class="line">    action=<span class="string">&quot;https://www.mocky.io/v2/5cc8019d300000980a055e76&quot;</span>	<span class="comment">// 代表请求的上传接口</span></span><br><span class="line">    :headers=<span class="string">&quot;headers&quot;</span>	<span class="comment">// 声明文件的头部，在data中定义</span></span><br><span class="line">    @change=<span class="string">&quot;handleChange&quot;</span>	<span class="comment">// 发送请求的方法</span></span><br><span class="line">  &gt;</span><br><span class="line">    &lt;a-button&gt; <span class="xml"><span class="tag">&lt;<span class="name">a-icon</span> <span class="attr">type</span>=<span class="string">&quot;upload&quot;</span> /&gt;</span></span> Click to Upload &lt;/a-button&gt;</span><br><span class="line">  &lt;/a-upload&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        <span class="comment">// 文件头部信息</span></span><br><span class="line">      headers: &#123;</span><br><span class="line">        authorization: <span class="string">&#x27;authorization-text&#x27;</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">handleChange</span>(<span class="params">info</span>)</span> &#123;		<span class="comment">// info：返回值</span></span><br><span class="line">      <span class="keyword">if</span> (info.file.status !== <span class="string">&#x27;uploading&#x27;</span>) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(info.file, info.fileList);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (info.file.status === <span class="string">&#x27;done&#x27;</span>) &#123;		<span class="comment">// 上传成功</span></span><br><span class="line">        <span class="built_in">this</span>.$message.success(<span class="string">`<span class="subst">$&#123;info.file.name&#125;</span> file uploaded successfully`</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (info.file.status === <span class="string">&#x27;error&#x27;</span>) &#123;		<span class="comment">// 上传失败</span></span><br><span class="line">        <span class="built_in">this</span>.$message.error(<span class="string">`<span class="subst">$&#123;info.file.name&#125;</span> file upload failed.`</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-存储为静态文件"><a href="#1-存储为静态文件" class="headerlink" title="1. 存储为静态文件"></a>1. 存储为静态文件</h4><ul>
-<li>前端发送过来的图片，django只需要把图片存放到配置好的静态目录下，并且将图片名存入到数据库中，通过静态路由+图片名就可以直接访问</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UploadFile</span>(<span class="params">View</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 接收参数</span></span><br><span class="line">        img = request.FILES.get(<span class="string">&quot;file&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 建立文件流</span></span><br><span class="line">        f = <span class="built_in">open</span>(os.path.join(UPLOAD_ROOT, <span class="string">&#x27;&#x27;</span>, img.name, ), <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">        <span class="comment"># 写文件</span></span><br><span class="line">        <span class="keyword">for</span> chunk <span class="keyword">in</span> img.chunks():</span><br><span class="line">            f.write(chunk)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 关闭文件流</span></span><br><span class="line">        f.close()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># with open(os.path.join(UPLOAD_ROOT, &#x27;&#x27;, img.name), &#x27;wb&#x27;) as f:</span></span><br><span class="line">        <span class="comment">#     # 写文件</span></span><br><span class="line">        <span class="comment">#     for chunk in img.chunks():</span></span><br><span class="line">        <span class="comment">#         f.write(chunk)</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(&#123;<span class="string">&#x27;filename&#x27;</span>: img.name&#125;, ensure_ascii=<span class="literal">False</span>), content_type=<span class="string">&#x27;application/json&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>注意：在写文件时，可以有两种方式</p>
-<ul>
-<li>建立文件流，使用Python内置的<code>open()</code>函数，传入文件名和标示符，最后使用f.close()关闭文件流，否则会占用内存资源</li>
-<li>with open语句，例如上文，每次建立文件流再关闭实在太繁琐，python引入了with语句来自动帮我们调用close()方法</li>
-</ul>
-<p>补充：img.chunks()：按块返回文件，通过在for循环中进行迭代，可以将大文件按块写入到<br>服务器中；</p>
-<h4 id="2-存储base64编码"><a href="#2-存储base64编码" class="headerlink" title="2. 存储base64编码"></a>2. 存储base64编码</h4><p>首先来了解一下什么是base64，BASE64是一种编码方式，通常用于把二进制数据编码为可写的字符形式的数据。这是一种可逆的编码方式。Base64编码的作用：由于某些系统中只能使用ASCII字符，Base64就是用来将非ASCII字符的数据转换成ASCII字符的一种方法。是一种“防君子不防小人”的编码方式。</p>
-<ul>
-<li>优点：速度快，ascii字符，肉眼不可理解</li>
-<li>编码比较长，非常容易被破解，仅适用于加密非关键信息的场合</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">1</span>).普通字符串编码</span><br><span class="line">s = <span class="string">&quot;我是一个字符串&quot;</span></span><br><span class="line"><span class="comment"># a bytes-like object is required</span></span><br><span class="line">encoder = base64.b64encode(s.encode(<span class="string">&quot;utf-8&quot;</span>))</span><br><span class="line">print(encoder) <span class="comment"># byte类型 b&#x27;5oiR5piv5LiA5Liq5a2X56ym5Liy&#x27;</span></span><br><span class="line"></span><br><span class="line">str_encoder = encoder.decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">print(str_encoder) <span class="comment"># str类型 5oiR5piv5LiA5Liq5a2X56ym5Liy</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解码过程</span></span><br><span class="line">decoder = base64.b64decode(str_encoder)</span><br><span class="line">print(decoder.decode(<span class="string">&#x27;utf-8&#x27;</span>)) <span class="comment"># 我是一个字符串</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">2</span>).图片编码</span><br><span class="line"><span class="comment"># 打开图片用二进制流方法</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;../static/upload/xxx.jpg&#x27;</span>, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="comment"># 读取</span></span><br><span class="line">    data = f.read()</span><br><span class="line">    <span class="comment"># 进行编码</span></span><br><span class="line">    encodestr = base64.b64encode(data)	<span class="comment"># byte类型 b&#x27;5oiR5piv5LiA5Liq5a2X56ym5Liy&#x27;</span></span><br><span class="line">	<span class="comment"># 解码</span></span><br><span class="line">    print(<span class="built_in">str</span>(encodestr), <span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>注意：</p>
-<ul>
-<li><p>要在数据库中存储base64时，需要将字段指定为longtext类型</p>
-</li>
-<li><p>base64编码的图片也可以直接在前端展示</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;img src=<span class="string">&quot;data:image/jpg(声明图片后缀);base64,编码&quot;</span> alt=<span class="string">&quot;&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拼接方法：</span></span><br><span class="line"><span class="built_in">this</span>.img_url = <span class="string">&#x27;data:image/&#x27;</span> + <span class="built_in">this</span>.suffix + <span class="string">&#x27;;base64,&#x27;</span> + <span class="built_in">this</span>.b64</span><br><span class="line"></span><br><span class="line"><span class="comment">// avatar头像展示,动态绑定拼接好的base64</span></span><br><span class="line">&lt;a-avatar :src=<span class="string">&quot;img_url&quot;</span> style=<span class="string">&quot;margin-left: 10px;&quot;</span>&gt;&lt;/a-avatar&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h4 id="3-上传到云端"><a href="#3-上传到云端" class="headerlink" title="3. 上传到云端"></a>3. 上传到云端</h4><p>企业云盘，可以为企业提供一个集中存储、管理文件的平台，避免文件的分散、无序，避免电脑病毒、硬盘破损等带来的文件丢失，文件分享更便捷，增强办公的协同性。</p>
-<p>常用云端：七牛云、阿里云、又拍云</p>
-<p>以又拍云为例子：</p>
-<p>首先安装又拍云sdk</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">pip install unyun</span><br></pre></td></tr></table></figure>
-
-<p>视图</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> upyun</span><br><span class="line"></span><br><span class="line"><span class="comment">#定义文件上传类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UploadFile</span>(<span class="params">View</span>):</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self,request</span>):</span></span><br><span class="line"></span><br><span class="line">        img = request.FILES.get(<span class="string">&#x27;file&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        up = upyun.UpYun(<span class="string">&#x27;你的空间名称&#x27;</span>, username=<span class="string">&#x27;操作员账号&#x27;</span>, password=<span class="string">&#x27;操作员密码&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        headers = &#123; <span class="string">&#x27;x-gmkerl-rotate&#x27;</span>: <span class="string">&#x27;auto&#x27;</span> &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> chunk <span class="keyword">in</span> img.chunks():</span><br><span class="line">            res = up.put(<span class="string">&#x27;/touxiang1.jpg&#x27;</span>, chunk, checksum=<span class="literal">True</span>, headers=headers)</span><br><span class="line"></span><br><span class="line">        <span class="comment">#返回结果</span></span><br><span class="line">        <span class="keyword">return</span> HttpResponse(json.dumps(&#123;<span class="string">&#x27;filename&#x27;</span>:img.name&#125;),content_type=<span class="string">&#x27;application/json&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>上传成功的图片可以通过又拍云分配的空间域名+图片名来进行访问</p>
-<p>又拍云上传参考大神技术博客：<a href="https://v3u.cn/a_id_140">https://v3u.cn/a_id_140</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>django优缺点总结</title>
     <url>/2020/01/25/django%E4%BC%98%E7%BC%BA%E7%82%B9%E6%80%BB%E7%BB%93/</url>
     <content><![CDATA[<h2 id="Django优缺点总结"><a href="#Django优缺点总结" class="headerlink" title="Django优缺点总结"></a>Django优缺点总结</h2><p>Django 是一个由 Python 编写的一个开放源代码的 Web 应用框架。</p>
@@ -1395,50 +1395,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>docker部署vue项目</title>
-    <url>/2020/08/24/docker%E9%83%A8%E7%BD%B2vue%E9%A1%B9%E7%9B%AE/</url>
-    <content><![CDATA[<p>上篇介绍了为何使用docker容器式部署，以及部署django后端项目，接下来就轮到我们的前端服务vue.js了，其实是大同小异的，详情请继续看</p>
-<a id="more"></a>
-
-<p>首先打开vue项目的打包配置文件config/index.js</p>
-<h3 id="1-vue打包配置文件"><a href="#1-vue打包配置文件" class="headerlink" title="1. vue打包配置文件"></a>1. vue打包配置文件</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">build: &#123;</span><br><span class="line">    <span class="comment">// Template for index.html</span></span><br><span class="line">    index: path.resolve(__dirname, <span class="string">&#x27;../dist/index.html&#x27;</span>),</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Paths</span></span><br><span class="line">    assetsRoot: path.resolve(__dirname, <span class="string">&#x27;../dist&#x27;</span>),</span><br><span class="line">    assetsSubDirectory: <span class="string">&#x27;static&#x27;</span>,</span><br><span class="line">    assetsPublicPath: <span class="string">&#x27;./&#x27;</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Source Maps</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    productionSourceMap: <span class="literal">true</span>,</span><br><span class="line">    <span class="comment">// https://webpack.js.org/configuration/devtool/#production</span></span><br><span class="line">    devtool: <span class="string">&#x27;#source-map&#x27;</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Gzip off by default as many popular static hosts such as</span></span><br><span class="line">    <span class="comment">// Surge or Netlify already gzip all static assets for you.</span></span><br><span class="line">    <span class="comment">// Before setting to `true`, make sure to:</span></span><br><span class="line">    <span class="comment">// npm install --save-dev compression-webpack-plugin</span></span><br><span class="line">    productionGzip: <span class="literal">false</span>,</span><br><span class="line">    productionGzipExtensions: [<span class="string">&#x27;js&#x27;</span>, <span class="string">&#x27;css&#x27;</span>],</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Run the build command with an extra argument to</span></span><br><span class="line">    <span class="comment">// View the bundle analyzer report after build finishes:</span></span><br><span class="line">    <span class="comment">// `npm run build --report`</span></span><br><span class="line">    <span class="comment">// Set to `true` or `false` to always turn it on or off</span></span><br><span class="line">    bundleAnalyzerReport: process.env.npm_config_report</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>将项目目录改成相对路径，同时注意路由的配置，如果曾经修改为history模式记得改回hash：</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Router(&#123;</span><br><span class="line">  routes:routes,</span><br><span class="line">  mode:<span class="string">&#x27;hash&#x27;</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-Dockerfile文件"><a href="#2-Dockerfile文件" class="headerlink" title="2.Dockerfile文件"></a>2.Dockerfile文件</h3><p>准备工作完毕，在vue的项目根目录下编写Dockerfile：</p>
-<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node:lts-alpine</span><br><span class="line"></span><br><span class="line"><span class="comment"># install simple http server for serving static content</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> npm install -g http-server</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># make the &#x27;app&#x27; folder the current working directory</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># copy both &#x27;package.json&#x27; and &#x27;package-lock.json&#x27; (if available)</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> package*.json ./</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># install project dependencies</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> npm install</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># copy project files and folders to the current working directory (i.e. &#x27;app&#x27; folder)</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> . .</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># build app for production with minification</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> npm run build</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># port</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [ <span class="string">&quot;http-server&quot;</span>, <span class="string">&quot;dist&quot;</span> ]</span></span><br></pre></td></tr></table></figure>
-
-<p>这里我们选择体积更小的alpine镜像。</p>
-<h3 id="3-打包镜像"><a href="#3-打包镜像" class="headerlink" title="3.打包镜像"></a>3.打包镜像</h3><p>随后进入项目的根目录，执行打包命令：</p>
-<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line">docker build -t myvue .</span><br></pre></td></tr></table></figure>
-
-<p>myvue为你vue项目名称，同django项目一样，系统会自动根据脚本进行安装依赖，第一次也需要等待一段时间。</p>
-<p>打包完成后，查看镜像：</p>
-<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
-
-<p>可以看到前端镜像的体积要小一点</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">E:\myvue&gt;docker images</span><br><span class="line">REPOSITORY          TAG             IMAGE ID         CREATED             SIZE</span><br><span class="line">myvue               latest          475b8cf5f19f     19 hours ago        572MB</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-启动镜像服务"><a href="#4-启动镜像服务" class="headerlink" title="4.启动镜像服务"></a>4.启动镜像服务</h3><figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line">docker <span class="keyword">run</span><span class="bash"> -it --rm -p 8081:8080 myvue</span></span><br></pre></td></tr></table></figure>
-
-<p>同样使用端口映射，这次宿主机使用8081，当然了，如果需要可以根据喜好进行修改。</p>
-<p>访问vue.js服务</p>
-<p><img src="https://img-blog.csdnimg.cn/20201122231851650.png#pic_center"></p>
-<p>至此，通过Docker的容器技术，我们就将前后端两大服务都分别部署好了，花时间学习使用Docker部署项目是非常值得的。因为构建的镜像是可以复用的，一但你熟悉了项目的布局和使用Docker部署和启动服务的基本流程，你会发现部署变得非常简单了，而且再也不用担心宿主机所在的操作系统或环境，真正实现了项目的可移植</p>
-<p>ps：</p>
-<p>–rm：在Docker容器退出时，默认容器内部的文件系统仍然被保留，以方便调试并保留用户数据。</p>
-<p>但是，对于foreground容器，由于其只是在开发调试过程中短期运行，其用户数据并无保留的必要，因而可以在容器启动时设置–rm选项，这样在容器退出时就能够自动清理容器内部的文件系统。</p>
-<p>部署中遇到的坑：</p>
-<ol>
-<li><p>如果在执行第三步打包镜像出故障的话，可以先在执行npm run build进行生产环境打包部署</p>
-</li>
-<li><p>导致npm run build失败有可能是有的第三方插件出问题，例如在此项目中我引用了一个emoji插件，导致打包部署一直失败，将它弃用之后就成功了，所以有可能是第三方插件的原因导致的。</p>
-</li>
-</ol>
-]]></content>
-  </entry>
-  <entry>
     <title>git</title>
     <url>/2021/04/06/git/</url>
     <content><![CDATA[<h1 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h1><ul>
@@ -1520,6 +1476,64 @@
       </tags>
   </entry>
   <entry>
+    <title>docker部署vue项目</title>
+    <url>/2020/08/24/docker%E9%83%A8%E7%BD%B2vue%E9%A1%B9%E7%9B%AE/</url>
+    <content><![CDATA[<p>上篇介绍了为何使用docker容器式部署，以及部署django后端项目，接下来就轮到我们的前端服务vue.js了，其实是大同小异的，详情请继续看</p>
+<a id="more"></a>
+
+<p>首先打开vue项目的打包配置文件config/index.js</p>
+<h3 id="1-vue打包配置文件"><a href="#1-vue打包配置文件" class="headerlink" title="1. vue打包配置文件"></a>1. vue打包配置文件</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">build: &#123;</span><br><span class="line">    <span class="comment">// Template for index.html</span></span><br><span class="line">    index: path.resolve(__dirname, <span class="string">&#x27;../dist/index.html&#x27;</span>),</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Paths</span></span><br><span class="line">    assetsRoot: path.resolve(__dirname, <span class="string">&#x27;../dist&#x27;</span>),</span><br><span class="line">    assetsSubDirectory: <span class="string">&#x27;static&#x27;</span>,</span><br><span class="line">    assetsPublicPath: <span class="string">&#x27;./&#x27;</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Source Maps</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    productionSourceMap: <span class="literal">true</span>,</span><br><span class="line">    <span class="comment">// https://webpack.js.org/configuration/devtool/#production</span></span><br><span class="line">    devtool: <span class="string">&#x27;#source-map&#x27;</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Gzip off by default as many popular static hosts such as</span></span><br><span class="line">    <span class="comment">// Surge or Netlify already gzip all static assets for you.</span></span><br><span class="line">    <span class="comment">// Before setting to `true`, make sure to:</span></span><br><span class="line">    <span class="comment">// npm install --save-dev compression-webpack-plugin</span></span><br><span class="line">    productionGzip: <span class="literal">false</span>,</span><br><span class="line">    productionGzipExtensions: [<span class="string">&#x27;js&#x27;</span>, <span class="string">&#x27;css&#x27;</span>],</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Run the build command with an extra argument to</span></span><br><span class="line">    <span class="comment">// View the bundle analyzer report after build finishes:</span></span><br><span class="line">    <span class="comment">// `npm run build --report`</span></span><br><span class="line">    <span class="comment">// Set to `true` or `false` to always turn it on or off</span></span><br><span class="line">    bundleAnalyzerReport: process.env.npm_config_report</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将项目目录改成相对路径，同时注意路由的配置，如果曾经修改为history模式记得改回hash：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">new</span> Router(&#123;</span><br><span class="line">  routes:routes,</span><br><span class="line">  mode:<span class="string">&#x27;hash&#x27;</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Dockerfile文件"><a href="#2-Dockerfile文件" class="headerlink" title="2.Dockerfile文件"></a>2.Dockerfile文件</h3><p>准备工作完毕，在vue的项目根目录下编写Dockerfile：</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node:lts-alpine</span><br><span class="line"></span><br><span class="line"><span class="comment"># install simple http server for serving static content</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> npm install -g http-server</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># make the &#x27;app&#x27; folder the current working directory</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># copy both &#x27;package.json&#x27; and &#x27;package-lock.json&#x27; (if available)</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> package*.json ./</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># install project dependencies</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> npm install</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># copy project files and folders to the current working directory (i.e. &#x27;app&#x27; folder)</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> . .</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># build app for production with minification</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> npm run build</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># port</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [ <span class="string">&quot;http-server&quot;</span>, <span class="string">&quot;dist&quot;</span> ]</span></span><br></pre></td></tr></table></figure>
+
+<p>这里我们选择体积更小的alpine镜像。</p>
+<h3 id="3-打包镜像"><a href="#3-打包镜像" class="headerlink" title="3.打包镜像"></a>3.打包镜像</h3><p>随后进入项目的根目录，执行打包命令：</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line">docker build -t myvue .</span><br></pre></td></tr></table></figure>
+
+<p>myvue为你vue项目名称，同django项目一样，系统会自动根据脚本进行安装依赖，第一次也需要等待一段时间。</p>
+<p>打包完成后，查看镜像：</p>
+<figure class="highlight docker"><table><tr><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+
+<p>可以看到前端镜像的体积要小一点</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">E:\myvue&gt;docker images</span><br><span class="line">REPOSITORY          TAG             IMAGE ID         CREATED             SIZE</span><br><span class="line">myvue               latest          475b8cf5f19f     19 hours ago        572MB</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-启动镜像服务"><a href="#4-启动镜像服务" class="headerlink" title="4.启动镜像服务"></a>4.启动镜像服务</h3><figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line">docker <span class="keyword">run</span><span class="bash"> -it --rm -p 8081:8080 myvue</span></span><br></pre></td></tr></table></figure>
+
+<p>同样使用端口映射，这次宿主机使用8081，当然了，如果需要可以根据喜好进行修改。</p>
+<p>访问vue.js服务</p>
+<p><img src="https://img-blog.csdnimg.cn/20201122231851650.png#pic_center"></p>
+<p>至此，通过Docker的容器技术，我们就将前后端两大服务都分别部署好了，花时间学习使用Docker部署项目是非常值得的。因为构建的镜像是可以复用的，一但你熟悉了项目的布局和使用Docker部署和启动服务的基本流程，你会发现部署变得非常简单了，而且再也不用担心宿主机所在的操作系统或环境，真正实现了项目的可移植</p>
+<p>ps：</p>
+<p>–rm：在Docker容器退出时，默认容器内部的文件系统仍然被保留，以方便调试并保留用户数据。</p>
+<p>但是，对于foreground容器，由于其只是在开发调试过程中短期运行，其用户数据并无保留的必要，因而可以在容器启动时设置–rm选项，这样在容器退出时就能够自动清理容器内部的文件系统。</p>
+<p>部署中遇到的坑：</p>
+<ol>
+<li><p>如果在执行第三步打包镜像出故障的话，可以先在执行npm run build进行生产环境打包部署</p>
+</li>
+<li><p>导致npm run build失败有可能是有的第三方插件出问题，例如在此项目中我引用了一个emoji插件，导致打包部署一直失败，将它弃用之后就成功了，所以有可能是第三方插件的原因导致的。</p>
+</li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
+    <title>kwarys,arys,with,evel,多线程，多进程</title>
+    <url>/2021/03/10/kwarys,arys,with,evel,%E5%A4%9A%E7%BA%BF%E7%A8%8B,%E5%A4%9A%E8%BF%9B%E7%A8%8B/</url>
+    <content><![CDATA[<p>kwarys用来传键值对</p>
+<p>arys用来传有序的</p>
+<p>with 关键字使用 : 省略开始，关闭</p>
+<p>eval():<br>    eval函数就是实现list dict tuple与str之间的转化</p>
+<p>多线程:<br>    适用于io密集型任务</p>
+<p>多进程:<br>    适用于cup密集型任务</p>
+<p>线程池：节约了开启，关闭的时间，提高了效率</p>
+<p>多线程的弊端：发生资源分配竞争</p>
+<p>自醒机制：dir()</p>
+]]></content>
+  </entry>
+  <entry>
     <title>jwt解密</title>
     <url>/2021/01/14/jwt%E8%A7%A3%E5%AF%86/</url>
     <content><![CDATA[<p>jwt：</p>
@@ -1542,20 +1556,6 @@ print(encode_str)
 # 解密
 decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;HS256&#39;])
 </code></pre>
-]]></content>
-  </entry>
-  <entry>
-    <title>kwarys,arys,with,evel,多线程，多进程</title>
-    <url>/2021/03/10/kwarys,arys,with,evel,%E5%A4%9A%E7%BA%BF%E7%A8%8B,%E5%A4%9A%E8%BF%9B%E7%A8%8B/</url>
-    <content><![CDATA[<p>kwarys用来传键值对</p>
-<p>arys用来传有序的</p>
-<p>with 关键字使用 : 省略开始，关闭</p>
-<p>eval():<br>    eval函数就是实现list dict tuple与str之间的转化</p>
-<p>多线程:<br>    适用于io密集型任务</p>
-<p>多进程:<br>    适用于cup密集型任务</p>
-<p>线程池：节约了开启，关闭的时间，提高了效率</p>
-<p>多线程的弊端：发生资源分配竞争</p>
-<p>自醒机制：dir()</p>
 ]]></content>
   </entry>
   <entry>
@@ -1619,28 +1619,6 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 ]]></content>
   </entry>
   <entry>
-    <title>python实现简单工厂模式</title>
-    <url>/2019/04/01/python%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
-    <content><![CDATA[<h2 id="设计模式之简单工厂模式："><a href="#设计模式之简单工厂模式：" class="headerlink" title="设计模式之简单工厂模式："></a>设计模式之简单工厂模式：</h2><h3 id="模式定义："><a href="#模式定义：" class="headerlink" title="模式定义："></a>模式定义：</h3><p>定义一个工厂类，它可以根据参数的不同返回不同类的实例，在简单工厂模式中用于被创建实例 的方法通常为静态(static)方法,因此简单工厂模式又被成为静态工厂方法(Static Factory Method)。</p>
-<a id="more"></a>
-<p>需要什么，只需要传入一个正确的参数，就可以获取所需要的对象，而无需知道其实现过程</p>
-<h3 id="模式结构："><a href="#模式结构：" class="headerlink" title="模式结构："></a>模式结构：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">简单工厂模式包含如下角色：</span><br><span class="line">Factory：工厂角色</span><br><span class="line">Product：抽象产品角色</span><br><span class="line">ConcreteProduct：具体产品角色</span><br></pre></td></tr></table></figure>
-
-<h3 id="简单工厂："><a href="#简单工厂：" class="headerlink" title="简单工厂："></a>简单工厂：</h3><p>首先，我们来看一个简单工厂的例子：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Asus</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    华硕</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;ASUS&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dell</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    戴尔</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;DELL&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 假设我们有两款电脑产品，分别是戴尔和华硕，如果没有“工厂”来生产它们，我们就要在代码中自己进行实例化，如：</span></span><br><span class="line">asus = Asus()</span><br><span class="line">dell = Dell()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>但现实中，你可能会面对很多电脑产品，而且每个产品的构造参数还不一样，这样在创建实例时会遇到麻烦。这时就可以构造一个“简单工厂”把所有产品实例化的过程封装在里面。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleCarFactory</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    简单工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">name</span>):</span></span><br><span class="line">        <span class="keyword">if</span> name == <span class="string">&#x27;asus&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> Asus()</span><br><span class="line">        <span class="keyword">elif</span> name == <span class="string">&#x27;dell&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> Dell()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">simple_factory = SimpleCarFactory()</span><br><span class="line">asus = simple_factory.product_car(<span class="string">&#x27;asus&#x27;</span>)</span><br><span class="line">dell = SimpleCarFactory.product_car(<span class="string">&#x27;dell&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>你会发现，有了SimpleCarFactory类后，就可以通过向固定的接口传入参数获得想要的对象实例</p>
-<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ul>
-<li>简单工厂模式的要点在于：当你需要什么，只需要传入一个正确的参数，就可以获取你所需要的对象，而无须知道其创建细节。</li>
-<li>简单工厂模式最大的优点在于实现对象的创建和对象的使用分离，将对象的创建交给专门的工厂类负责，但是其最大的缺点在于工厂类不够灵活，增加新的具体产品需要修改工厂类的判断逻辑代码，而且产品较多时，工厂方法代码将会非常复杂。</li>
-<li>简单工厂模式适用情况包括：工厂类负责创建的对象比较少；客户端只知道传入工厂类的参数，对于如何创建对象不关心。</li>
-</ul>
-]]></content>
-  </entry>
-  <entry>
     <title>redis基础</title>
     <url>/2019/01/10/redis%E5%9F%BA%E7%A1%80/</url>
     <content><![CDATA[<h2 id="redis基础"><a href="#redis基础" class="headerlink" title="redis基础"></a>redis基础</h2><h3 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h3><p>REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。</p>
@@ -1662,6 +1640,28 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 
 
 
+]]></content>
+  </entry>
+  <entry>
+    <title>python实现简单工厂模式</title>
+    <url>/2019/04/01/python%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<h2 id="设计模式之简单工厂模式："><a href="#设计模式之简单工厂模式：" class="headerlink" title="设计模式之简单工厂模式："></a>设计模式之简单工厂模式：</h2><h3 id="模式定义："><a href="#模式定义：" class="headerlink" title="模式定义："></a>模式定义：</h3><p>定义一个工厂类，它可以根据参数的不同返回不同类的实例，在简单工厂模式中用于被创建实例 的方法通常为静态(static)方法,因此简单工厂模式又被成为静态工厂方法(Static Factory Method)。</p>
+<a id="more"></a>
+<p>需要什么，只需要传入一个正确的参数，就可以获取所需要的对象，而无需知道其实现过程</p>
+<h3 id="模式结构："><a href="#模式结构：" class="headerlink" title="模式结构："></a>模式结构：</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">简单工厂模式包含如下角色：</span><br><span class="line">Factory：工厂角色</span><br><span class="line">Product：抽象产品角色</span><br><span class="line">ConcreteProduct：具体产品角色</span><br></pre></td></tr></table></figure>
+
+<h3 id="简单工厂："><a href="#简单工厂：" class="headerlink" title="简单工厂："></a>简单工厂：</h3><p>首先，我们来看一个简单工厂的例子：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Asus</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    华硕</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;ASUS&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dell</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    戴尔</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;DELL&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 假设我们有两款电脑产品，分别是戴尔和华硕，如果没有“工厂”来生产它们，我们就要在代码中自己进行实例化，如：</span></span><br><span class="line">asus = Asus()</span><br><span class="line">dell = Dell()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>但现实中，你可能会面对很多电脑产品，而且每个产品的构造参数还不一样，这样在创建实例时会遇到麻烦。这时就可以构造一个“简单工厂”把所有产品实例化的过程封装在里面。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleCarFactory</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    简单工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">name</span>):</span></span><br><span class="line">        <span class="keyword">if</span> name == <span class="string">&#x27;asus&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> Asus()</span><br><span class="line">        <span class="keyword">elif</span> name == <span class="string">&#x27;dell&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> Dell()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">simple_factory = SimpleCarFactory()</span><br><span class="line">asus = simple_factory.product_car(<span class="string">&#x27;asus&#x27;</span>)</span><br><span class="line">dell = SimpleCarFactory.product_car(<span class="string">&#x27;dell&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>你会发现，有了SimpleCarFactory类后，就可以通过向固定的接口传入参数获得想要的对象实例</p>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><ul>
+<li>简单工厂模式的要点在于：当你需要什么，只需要传入一个正确的参数，就可以获取你所需要的对象，而无须知道其创建细节。</li>
+<li>简单工厂模式最大的优点在于实现对象的创建和对象的使用分离，将对象的创建交给专门的工厂类负责，但是其最大的缺点在于工厂类不够灵活，增加新的具体产品需要修改工厂类的判断逻辑代码，而且产品较多时，工厂方法代码将会非常复杂。</li>
+<li>简单工厂模式适用情况包括：工厂类负责创建的对象比较少；客户端只知道传入工厂类的参数，对于如何创建对象不关心。</li>
+</ul>
 ]]></content>
   </entry>
   <entry>
@@ -1742,6 +1742,44 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">print(<span class="built_in">int</span>(<span class="string">&#x27;00001&#x27;</span>, <span class="number">2</span>))</span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure>
 
 <p>可以看到，转换结果显示该id存储在节点1的数据库中，如此就具备了相当强的业务属性，通过反推逻辑我们可以快速准确的定位到数据的具体存储位置从而进行查询。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>vue安装</title>
+    <url>/2018/11/01/vue%E5%AE%89%E8%A3%85/</url>
+    <content><![CDATA[<h2 id="1-vue核心概念"><a href="#1-vue核心概念" class="headerlink" title="1. vue核心概念"></a>1. vue核心概念</h2><p>Vue.js（读音 /vjuː/, 类似于 view） 是一套构建用户界面的渐进式框架。</p>
+<a id="more"></a>
+
+<p>Vue 只关注视图层， 采用自底向上增量开发的设计。</p>
+<p>Vue 的目标是通过尽可能简单的 API 实现响应的数据绑定和组合的视图组件。</p>
+<p>官方文档：<a href="http://vuejs.org/v2/guide/syntax.html">http://vuejs.org/v2/guide/syntax.html</a></p>
+<p>中文文档: <a href="https://cn.vuejs.org/v2/guide/syntax.html">https://cn.vuejs.org/v2/guide/syntax.html</a></p>
+<h2 id="2-vue-js安装"><a href="#2-vue-js安装" class="headerlink" title="2. vue.js安装"></a>2. vue.js安装</h2><h4 id="2-1-安装node-js环境（npm包管理工具）"><a href="#2-1-安装node-js环境（npm包管理工具）" class="headerlink" title="2.1 安装node.js环境（npm包管理工具）"></a>2.1 安装node.js环境（npm包管理工具）</h4><p>从<a href="https://nodejs.org/en/">node.js官网</a>下载并安装node，安装过程很简单，一直点下一步就ok了</p>
+<p>安装完成之后，进入命令行窗口，输入node -v命令，查看node的版本</p>
+<p> <img src="/node%E7%89%88%E6%9C%AC.jpg" alt="node版本"></p>
+<h4 id="2-2-安装vue-cli脚手架构建工具（必须在全局中进行安装）"><a href="#2-2-安装vue-cli脚手架构建工具（必须在全局中进行安装）" class="headerlink" title="2.2 安装vue-cli脚手架构建工具（必须在全局中进行安装）"></a>2.2 安装vue-cli脚手架构建工具（必须在全局中进行安装）</h4><ol>
+<li><p>在命令行中运行命令 npm install -g vue-cli ，然后等待安装完成。</p>
+</li>
+<li><p>是否安装成功：vue -V</p>
+</li>
+</ol>
+<h4 id="2-3-切换国内镜像源"><a href="#2-3-切换国内镜像源" class="headerlink" title="2.3 切换国内镜像源"></a>2.3 切换国内镜像源</h4><ol>
+<li><p>使用cnpm</p>
+<ul>
+<li>由于有些npm资源被屏蔽或者是国外资源的原因，经常会导致npm安装依赖包的时候失败，所以我们还需要npm的国内镜像—-cnpm.</li>
+<li>在命令行中输入npm install -g cnpm –registry=<a href="http://registry.npm.taobao.org/">http://registry.npm.taobao.org</a></li>
+</ul>
+</li>
+<li><p>将npm切换为淘宝镜像源</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">npm set registry https:<span class="comment">//registry.npm.taobao.org</span></span><br><span class="line">指定源</span><br><span class="line"></span><br><span class="line">npm config list</span><br><span class="line">查看npm信息</span><br><span class="line"></span><br><span class="line">npm install npm -g</span><br><span class="line">升级npm</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果出现任何关于node依赖的问题导致服务无法启动，执行npm install无法解决的，则安装rimraf,然后进入项目目录下，执行rimraf node_modules 删除后，重新执行 npm install 安装依赖</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">删除node_modules</span><br><span class="line"></span><br><span class="line">npm install rimraf -g</span><br><span class="line"></span><br><span class="line">rimraf node_modules</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h4 id="2-4-创建vue项目"><a href="#2-4-创建vue项目" class="headerlink" title="2.4 创建vue项目"></a>2.4 创建vue项目</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 初始化项目</span></span><br><span class="line">vue init webpack vue01  <span class="comment"># 在文件夹对应的cmd窗口使用， 输完回车</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 接下来选择配置项目信息</span></span><br><span class="line">? Project name (vue01)  #项目名称 默认回车即可</span><br><span class="line">? Project description (A Vue.js project)  # 项目描述 默认回车即可</span><br><span class="line">? Author   # 作者  默认回车即可</span><br><span class="line"></span><br><span class="line">? Vue build (Use arrow keys)    # 打包项目选项 默认回车即可</span><br><span class="line">? Install vue-router? (Y/n)   # 是否安装路由  输入y</span><br><span class="line">? Use ESLint to lint your code? (Y/n)  # 是否使用eslint检测代码， 输入n</span><br><span class="line">? Set up unit tests (Y/n)   # 是否使用测试单元    输入 n</span><br><span class="line">? Setup e2e tests with Nightwatch?  #   输入n</span><br><span class="line">? Should we run `npm install` for you after the project has been created? (recommended)</span><br><span class="line">    ❯ Yes, use NPM  <span class="comment"># 是否使用npm包管理工具</span></span><br><span class="line">    Yes, use Yarn  <span class="comment"># 是否使用yarn包管理工具</span></span><br><span class="line">    No, I will handle that myself  <span class="comment"># 不，我使用我自己的工具，想使用cnpm选第三个选项</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 进入项目文件夹，在终端安装必备的包</span></span><br><span class="line">cd vue01  <span class="comment"># 首先进入项目文件夹</span></span><br><span class="line">npm install  <span class="comment"># 如果上面选的是第三个选项， 这一步是必须的，使用cnpm工具，安装一些必备的项目包, </span></span><br><span class="line">            <span class="comment"># 如果上面选的是npm，这一步没必要，当然多运行一遍，也没问题</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 在终端运行项目</span></span><br><span class="line">npm run dev  <span class="comment"># 两个命令任意一个即可，启动项目</span></span><br></pre></td></tr></table></figure>
+
 ]]></content>
   </entry>
   <entry>
@@ -1855,44 +1893,6 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 ]]></content>
   </entry>
   <entry>
-    <title>vue安装</title>
-    <url>/2018/11/01/vue%E5%AE%89%E8%A3%85/</url>
-    <content><![CDATA[<h2 id="1-vue核心概念"><a href="#1-vue核心概念" class="headerlink" title="1. vue核心概念"></a>1. vue核心概念</h2><p>Vue.js（读音 /vjuː/, 类似于 view） 是一套构建用户界面的渐进式框架。</p>
-<a id="more"></a>
-
-<p>Vue 只关注视图层， 采用自底向上增量开发的设计。</p>
-<p>Vue 的目标是通过尽可能简单的 API 实现响应的数据绑定和组合的视图组件。</p>
-<p>官方文档：<a href="http://vuejs.org/v2/guide/syntax.html">http://vuejs.org/v2/guide/syntax.html</a></p>
-<p>中文文档: <a href="https://cn.vuejs.org/v2/guide/syntax.html">https://cn.vuejs.org/v2/guide/syntax.html</a></p>
-<h2 id="2-vue-js安装"><a href="#2-vue-js安装" class="headerlink" title="2. vue.js安装"></a>2. vue.js安装</h2><h4 id="2-1-安装node-js环境（npm包管理工具）"><a href="#2-1-安装node-js环境（npm包管理工具）" class="headerlink" title="2.1 安装node.js环境（npm包管理工具）"></a>2.1 安装node.js环境（npm包管理工具）</h4><p>从<a href="https://nodejs.org/en/">node.js官网</a>下载并安装node，安装过程很简单，一直点下一步就ok了</p>
-<p>安装完成之后，进入命令行窗口，输入node -v命令，查看node的版本</p>
-<p> <img src="/node%E7%89%88%E6%9C%AC.jpg" alt="node版本"></p>
-<h4 id="2-2-安装vue-cli脚手架构建工具（必须在全局中进行安装）"><a href="#2-2-安装vue-cli脚手架构建工具（必须在全局中进行安装）" class="headerlink" title="2.2 安装vue-cli脚手架构建工具（必须在全局中进行安装）"></a>2.2 安装vue-cli脚手架构建工具（必须在全局中进行安装）</h4><ol>
-<li><p>在命令行中运行命令 npm install -g vue-cli ，然后等待安装完成。</p>
-</li>
-<li><p>是否安装成功：vue -V</p>
-</li>
-</ol>
-<h4 id="2-3-切换国内镜像源"><a href="#2-3-切换国内镜像源" class="headerlink" title="2.3 切换国内镜像源"></a>2.3 切换国内镜像源</h4><ol>
-<li><p>使用cnpm</p>
-<ul>
-<li>由于有些npm资源被屏蔽或者是国外资源的原因，经常会导致npm安装依赖包的时候失败，所以我们还需要npm的国内镜像—-cnpm.</li>
-<li>在命令行中输入npm install -g cnpm –registry=<a href="http://registry.npm.taobao.org/">http://registry.npm.taobao.org</a></li>
-</ul>
-</li>
-<li><p>将npm切换为淘宝镜像源</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">npm set registry https:<span class="comment">//registry.npm.taobao.org</span></span><br><span class="line">指定源</span><br><span class="line"></span><br><span class="line">npm config list</span><br><span class="line">查看npm信息</span><br><span class="line"></span><br><span class="line">npm install npm -g</span><br><span class="line">升级npm</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>如果出现任何关于node依赖的问题导致服务无法启动，执行npm install无法解决的，则安装rimraf,然后进入项目目录下，执行rimraf node_modules 删除后，重新执行 npm install 安装依赖</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">删除node_modules</span><br><span class="line"></span><br><span class="line">npm install rimraf -g</span><br><span class="line"></span><br><span class="line">rimraf node_modules</span><br></pre></td></tr></table></figure>
-
-</li>
-</ol>
-<h4 id="2-4-创建vue项目"><a href="#2-4-创建vue项目" class="headerlink" title="2.4 创建vue项目"></a>2.4 创建vue项目</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 1. 初始化项目</span></span><br><span class="line">vue init webpack vue01  <span class="comment"># 在文件夹对应的cmd窗口使用， 输完回车</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 接下来选择配置项目信息</span></span><br><span class="line">? Project name (vue01)  #项目名称 默认回车即可</span><br><span class="line">? Project description (A Vue.js project)  # 项目描述 默认回车即可</span><br><span class="line">? Author   # 作者  默认回车即可</span><br><span class="line"></span><br><span class="line">? Vue build (Use arrow keys)    # 打包项目选项 默认回车即可</span><br><span class="line">? Install vue-router? (Y/n)   # 是否安装路由  输入y</span><br><span class="line">? Use ESLint to lint your code? (Y/n)  # 是否使用eslint检测代码， 输入n</span><br><span class="line">? Set up unit tests (Y/n)   # 是否使用测试单元    输入 n</span><br><span class="line">? Setup e2e tests with Nightwatch?  #   输入n</span><br><span class="line">? Should we run `npm install` for you after the project has been created? (recommended)</span><br><span class="line">    ❯ Yes, use NPM  <span class="comment"># 是否使用npm包管理工具</span></span><br><span class="line">    Yes, use Yarn  <span class="comment"># 是否使用yarn包管理工具</span></span><br><span class="line">    No, I will handle that myself  <span class="comment"># 不，我使用我自己的工具，想使用cnpm选第三个选项</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 进入项目文件夹，在终端安装必备的包</span></span><br><span class="line">cd vue01  <span class="comment"># 首先进入项目文件夹</span></span><br><span class="line">npm install  <span class="comment"># 如果上面选的是第三个选项， 这一步是必须的，使用cnpm工具，安装一些必备的项目包, </span></span><br><span class="line">            <span class="comment"># 如果上面选的是npm，这一步没必要，当然多运行一遍，也没问题</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 在终端运行项目</span></span><br><span class="line">npm run dev  <span class="comment"># 两个命令任意一个即可，启动项目</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-  </entry>
-  <entry>
     <title>三方聊天机器人</title>
     <url>/2020/07/11/%E4%B8%89%E6%96%B9%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BA/</url>
     <content><![CDATA[<p>聊天机器人（Chatterbot）是经由对话或文字进行交谈的计算机程序。目前市面上提供三方api的机器人不胜枚举：微软小冰、腾讯闲聊、青云客机器人等等</p>
@@ -1929,6 +1929,33 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 ]]></content>
   </entry>
   <entry>
+    <title>初识人工智能</title>
+    <url>/2020/06/14/%E5%88%9D%E8%AF%86%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/</url>
+    <content><![CDATA[<h2 id="人工智能"><a href="#人工智能" class="headerlink" title="人工智能"></a>人工智能</h2><p><strong>人工智能</strong>（英语：artificial intelligence，缩写为<strong>AI</strong>），让机器具备人的特性，是一个非常广的领域。举个例子：</p>
+<a id="more"></a>
+
+<ol>
+<li><strong>聊天机器人</strong>，回复你消息的并不是人类，而是机器，但是让你觉得它就是一个人类。</li>
+<li><strong>自动驾驶</strong>领域，其实是辅助驾驶，可以自动识别路况，来帮你驾驶。所谓的自动驾驶，还不是特别成熟，需要慎用。</li>
+</ol>
+<p><strong>机器学习</strong>是人工智能的一个分支，是实现人工智能的一个途径，即以机器学习为手段解决人工智能中的问题。机器一旦训练完成，它的准确率可以达到百分之90以上，会比人的效率高很多。</p>
+<h3 id="聊天机器人"><a href="#聊天机器人" class="headerlink" title="聊天机器人"></a>聊天机器人</h3><p><strong>聊天机器人，即会聊天的机器人，你能像跟人聊天的方式，与它聊天（机器与人的区别在于人具有理解能力，有情感会思考）</strong></p>
+<p><strong>当前聊天机器人用到的技术</strong></p>
+<p>机器学习和深度学习：机器学习技术属于基础技术，比如说分类算法可以用于做用户的意图分类和情感分类；语言模型可以用于筛选语音识别后的句子是否通顺；聚类算法可以用于做用户的行为习惯分析等等。随着数据量越来越多，可以发挥深度学习的优势，更进一步提升聊天机器人的基础技术能力。</p>
+<h5 id="深度学习框架"><a href="#深度学习框架" class="headerlink" title="深度学习框架"></a>深度学习框架</h5><ol>
+<li><p><strong>TensorFlow</strong>：谷歌的Tensorflow——可以说是当今最流行的深度学习框架。Gmail、Uber、Airbnb、Nvidia和其他许多知名品牌都在使用它。作为当今主流和头号的DL框架，在TF身上共存了受欢迎程度和高效率。</p>
+<p>python是处理TensorFlow的最方便的客户端语言。不过，JavaScript、C++、Java、Go、C#和Julia也提供了实验性的交互界面。</p>
+<p>TF背后有谷歌的支持，它的开发和维护就有坚实的后盾，用户不必担心刚学会TF这个框架它就下架，因此投资时间和资源来学习它是有意义的。</p>
+</li>
+<li><p><strong>Keras</strong>：是用于构建和训练深度学习模型的 TensorFlow 高阶 API。利用此 API，可实现快速原型设计、先进的研究和生产。</p>
+<p>Keras是一个编写精美的API。API的功能特性可以完全帮助用户构建更多新奇复杂的应用。同时，Keras不会阻止对底层框架的访问。</p>
+<p>Keras编写的代码更加可读和简洁。</p>
+<p>使用Python生成器的Keras模型序列化/反序列化API、回调和数据流已经非常成熟。</p>
+</li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
     <title>倒排索引</title>
     <url>/2020/02/23/%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95/</url>
     <content><![CDATA[<h3 id="倒排索引的初衷"><a href="#倒排索引的初衷" class="headerlink" title="倒排索引的初衷"></a>倒排索引的初衷</h3><p><strong>倒排索引，它也是索引。索引，初衷都是为了快速检索到你要的数据。</strong></p>
@@ -1961,86 +1988,6 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 
 <p>不要无脑建索引，坚持最左前缀索引</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Unique 唯一索引</span><br><span class="line"></span><br><span class="line">Normal 普通索引（加大查询效率）</span><br><span class="line"></span><br><span class="line">Full Text 全文索引</span><br></pre></td></tr></table></figure>
-]]></content>
-  </entry>
-  <entry>
-    <title>初识人工智能</title>
-    <url>/2020/06/14/%E5%88%9D%E8%AF%86%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/</url>
-    <content><![CDATA[<h2 id="人工智能"><a href="#人工智能" class="headerlink" title="人工智能"></a>人工智能</h2><p><strong>人工智能</strong>（英语：artificial intelligence，缩写为<strong>AI</strong>），让机器具备人的特性，是一个非常广的领域。举个例子：</p>
-<a id="more"></a>
-
-<ol>
-<li><strong>聊天机器人</strong>，回复你消息的并不是人类，而是机器，但是让你觉得它就是一个人类。</li>
-<li><strong>自动驾驶</strong>领域，其实是辅助驾驶，可以自动识别路况，来帮你驾驶。所谓的自动驾驶，还不是特别成熟，需要慎用。</li>
-</ol>
-<p><strong>机器学习</strong>是人工智能的一个分支，是实现人工智能的一个途径，即以机器学习为手段解决人工智能中的问题。机器一旦训练完成，它的准确率可以达到百分之90以上，会比人的效率高很多。</p>
-<h3 id="聊天机器人"><a href="#聊天机器人" class="headerlink" title="聊天机器人"></a>聊天机器人</h3><p><strong>聊天机器人，即会聊天的机器人，你能像跟人聊天的方式，与它聊天（机器与人的区别在于人具有理解能力，有情感会思考）</strong></p>
-<p><strong>当前聊天机器人用到的技术</strong></p>
-<p>机器学习和深度学习：机器学习技术属于基础技术，比如说分类算法可以用于做用户的意图分类和情感分类；语言模型可以用于筛选语音识别后的句子是否通顺；聚类算法可以用于做用户的行为习惯分析等等。随着数据量越来越多，可以发挥深度学习的优势，更进一步提升聊天机器人的基础技术能力。</p>
-<h5 id="深度学习框架"><a href="#深度学习框架" class="headerlink" title="深度学习框架"></a>深度学习框架</h5><ol>
-<li><p><strong>TensorFlow</strong>：谷歌的Tensorflow——可以说是当今最流行的深度学习框架。Gmail、Uber、Airbnb、Nvidia和其他许多知名品牌都在使用它。作为当今主流和头号的DL框架，在TF身上共存了受欢迎程度和高效率。</p>
-<p>python是处理TensorFlow的最方便的客户端语言。不过，JavaScript、C++、Java、Go、C#和Julia也提供了实验性的交互界面。</p>
-<p>TF背后有谷歌的支持，它的开发和维护就有坚实的后盾，用户不必担心刚学会TF这个框架它就下架，因此投资时间和资源来学习它是有意义的。</p>
-</li>
-<li><p><strong>Keras</strong>：是用于构建和训练深度学习模型的 TensorFlow 高阶 API。利用此 API，可实现快速原型设计、先进的研究和生产。</p>
-<p>Keras是一个编写精美的API。API的功能特性可以完全帮助用户构建更多新奇复杂的应用。同时，Keras不会阻止对底层框架的访问。</p>
-<p>Keras编写的代码更加可读和简洁。</p>
-<p>使用Python生成器的Keras模型序列化/反序列化API、回调和数据流已经非常成熟。</p>
-</li>
-</ol>
-]]></content>
-  </entry>
-  <entry>
-    <title>如何基于ECharts的数据可视化实现综合信息分析决策系统</title>
-    <url>/2020/09/26/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8EECharts%E7%9A%84%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96%E5%AE%9E%E7%8E%B0%E7%BB%BC%E5%90%88%E4%BF%A1%E6%81%AF%E5%88%86%E6%9E%90%E5%86%B3%E7%AD%96%E7%B3%BB%E7%BB%9F/</url>
-    <content><![CDATA[<h2 id="如何基于ECharts的数据可视化实现综合信息分析决策系统"><a href="#如何基于ECharts的数据可视化实现综合信息分析决策系统" class="headerlink" title="如何基于ECharts的数据可视化实现综合信息分析决策系统"></a>如何基于ECharts的数据可视化实现综合信息分析决策系统</h2><p>这篇文章我想与大家聊一聊如何快速上手“数据可视化”    神器–Echarts</p>
-<a id="more"></a>
-
-<p>假设我们公司今年盈利两千万，明年盈利三千万。你将这些数据给老板以及投资人看的时候，它是一堆阿拉伯数字，并起不到视觉上的震撼，所以你要是这么做了，那无疑是搬起石头砸自己的脚。这个时候我们就要对数据做可视化了，为了清晰有效地传递信息，数据可视化可以使用统计图形、图表、折线图以及其他工具。对于我们这些数据分析初学者来说，刚好ECharts就可以帮我们来实现这些需求，它是一个使用JavaScript实现的开源可视化库，涵盖各行业图标，废话不多说，我们一起来看。</p>
-<p><strong>为什么要使用ECharts</strong></p>
-<ul>
-<li>简单、容易上手</li>
-<li>几乎可以满足我们所有的开发需要</li>
-<li>echarts 是国内做的最好的可视化库之一</li>
-</ul>
-<p><strong>如何在Vue项目中使用ECharts。</strong></p>
-<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">npm install echarts --save</span><br></pre></td></tr></table></figure>
-
-<h4 id="全局引入"><a href="#全局引入" class="headerlink" title="全局引入"></a>全局引入</h4><p>我们安装完成之后，可以在main.js中全局引入echarts</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> echarts <span class="keyword">from</span> <span class="string">&quot;echarts&quot;</span>;</span><br><span class="line">Vue.prototype.$echarts = echarts;</span><br></pre></td></tr></table></figure>
-
-<h4 id="创建图表"><a href="#创建图表" class="headerlink" title="创建图表"></a>创建图表</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div id&#x3D;&quot;app&quot;&gt;</span><br><span class="line">    &lt;div id&#x3D;&quot;main&quot; style&#x3D;&quot;width: 600px;height:400px;&quot;&gt;&lt;&#x2F;div&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &quot;app&quot;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    drawChart() &#123;</span><br><span class="line">      &#x2F;&#x2F; 基于准备好的dom，初始化echarts实例</span><br><span class="line">      let myChart &#x3D; this.$echarts.init(document.getElementById(&quot;main&quot;));</span><br><span class="line">      &#x2F;&#x2F; 指定图表的配置项和数据</span><br><span class="line">      let option &#x3D; &#123;</span><br><span class="line">        title: &#123;</span><br><span class="line">          text: &quot;ECharts 入门示例&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        tooltip: &#123;&#125;,</span><br><span class="line">        legend: &#123;</span><br><span class="line">          data: [&quot;销量&quot;]</span><br><span class="line">        &#125;,</span><br><span class="line">        xAxis: &#123;</span><br><span class="line">          data: [&quot;衬衫&quot;, &quot;羊毛衫&quot;, &quot;雪纺衫&quot;, &quot;裤子&quot;, &quot;高跟鞋&quot;, &quot;袜子&quot;]</span><br><span class="line">        &#125;,</span><br><span class="line">        yAxis: &#123;&#125;,</span><br><span class="line">        series: [</span><br><span class="line">          &#123;</span><br><span class="line">            name: &quot;销量&quot;,</span><br><span class="line">            type: &quot;bar&quot;,	&#x2F;&#x2F; 柱状图</span><br><span class="line">            data: [5, 20, 36, 10, 10, 20]</span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;;</span><br><span class="line">      &#x2F;&#x2F; 使用刚指定的配置项和数据显示图表。</span><br><span class="line">      myChart.setOption(option);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted() &#123;</span><br><span class="line">    this.drawChart();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
-
-<p>不出意外的话，此时在页面中就可以看到你的效果了。</p>
-<p><img src="https://img-blog.csdnimg.cn/20201126234935952.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<p>只是这一点简单的代码，就已经实现了一个不可思议的功能，并且它还有很大的可操作性，只需要将方法中的一些固定参数进行动态绑定，如此简单，是不是会感到很惊讶，别着急，精彩的还在后面。</p>
-<p>相信对理财投资比较感兴趣的伙伴都听说过<strong>K线图</strong>这个玩意，科普一下，K线图又称蜡烛图、日本线、阴阳线、棒线等，常用说法是“K线”，起源于日本十八世纪德川幕府时代（1603～1867年）的米市交易，用来计算米价每天的涨跌。这就是K线图的起源及背景，现在已经广泛应用于股票、期货、外汇，期权等证券市场。我们刚入门还是不做这么高大上的了，来做一个美元对人民币汇率兑换实时走势图，其实很好理解，就是一个折线图。先上效果</p>
-<p><img src="https://media.giphy.com/media/864Icf413pw4tkbVem/giphy.gif"></p>
-<p>大致效果就是这样的，它是可以一直动态渲染的，我只给它设定了5个时间段的汇率信息，由于是用来测试，方便查阅效果，在这里我将定时设的短了一点。</p>
-<p>那它的需求是什么呢，就好比用户打开我这个页面，需要查看实时汇率，比如每隔一分钟动态加载一次汇率信息，服务端就需要将前5分钟的信息展示给用户，其实是可以实现的，这里只是一个小demo，就暂且写成这样。</p>
-<hr>
-<h3 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h3><p>第一步，后端需要获取到实时汇率信息，</p>
-<p>可以利用requests定时请求固定资源，这里我是从新浪财经获取到的数据。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">exchange_rate</span>():</span></span><br><span class="line">    url = <span class="string">&#x27;https://hq.sinajs.cn/rn=1606355458081list=fx_susdcny&#x27;</span></span><br><span class="line">    res = requests.get(url=url)</span><br><span class="line">    date = re.search(<span class="string">r&#x27;\d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;&#x27;</span>, res.text).group()</span><br><span class="line">    exchange_rate = re.search(<span class="string">r&#x27;\d.\d&#123;4&#125;&#x27;</span>, res.text).group()</span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">&#x27;date&#x27;</span>: date,</span><br><span class="line">        <span class="string">&#x27;exchange_rate&#x27;</span>: exchange_rate</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据形式：&#123;&#x27;date&#x27;: &#x27;22:10:00&#x27;, &#x27;exchange_rate&#x27;: &#x27;6.5768&#x27;&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>这里写了一个简单的爬虫，由于网站的不同，需要根据个人情况而定，返回的数据大概就是这样的。一个最新的时间以及汇率。</p>
-<h4 id="2-前后端连接websocket"><a href="#2-前后端连接websocket" class="headerlink" title="2. 前后端连接websocket"></a>2. 前后端连接websocket</h4><p>这里还是值得推敲的，我们为什么要使用<strong>websocket</strong>而不用传统的<strong>http</strong>协议呢。</p>
-<p>就我们这个demo来说，使用http，只能是客户端向服务器发出请求，服务器返回查询结果。HTTP 协议做不到服务器主动向客户端推送信息。这种<strong>单向请求</strong>的特点，注定了如果服务器有连续的状态变化，客户端要获知就非常麻烦。我们只能使用<strong>“轮询”</strong>：每隔一段时候，就发出一个询问，了解服务器有没有新的信息。可想而知效率是有多低，这个太low了，我们要用就用高大上的。WebSocket 协议它的最大特点就是，服务器可以主动向客户端推送信息，客户端也可以主动向服务器发送信息，是真正的双向平等对话，属于<strong>服务器推送技术</strong>的一种。</p>
-<p><strong>vue端发起链接请求，页面挂载时调用</strong></p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">link_ws</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="comment">// 判断浏览器是否支持websocket</span></span><br><span class="line">        <span class="function"><span class="title">if</span>(<span class="params"><span class="string">&quot;WebSocket&quot;</span> <span class="keyword">in</span> <span class="built_in">window</span></span>)</span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;支持&quot;</span>)</span><br><span class="line">            <span class="comment">// 生成websocket链接</span></span><br><span class="line">            <span class="keyword">var</span> ws = <span class="keyword">new</span> WebSocket(<span class="string">&#x27;ws://192.168.1.119:8000/websocket_link/&#x27;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 发送链接请求</span></span><br><span class="line">            ws.onopen = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                <span class="comment">// 这里的参数是可以随意改变的，也可以将用户凭证传给后端作为存储对象</span></span><br><span class="line">                ws.send(<span class="string">&#x27;test&#x27;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 获取服务端返回数据</span></span><br><span class="line">            ws.onmessage = <span class="function">(<span class="params">evt</span>)=&gt;</span>&#123;</span><br><span class="line">                <span class="built_in">console</span>.log(evt.data)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 捕获断开链接</span></span><br><span class="line">            ws.onclose = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                <span class="built_in">console</span>.log(<span class="string">&quot;链接已经关闭&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;,</span><br><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.link_ws();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里其实都是websocket使用的一些基本方法，也是简单明了的</p>
-<p><strong>django端接收链接请求并定时主动推送汇率信息</strong></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入dwebsocket的库</span></span><br><span class="line"><span class="keyword">from</span> dwebsocket.decorators <span class="keyword">import</span> accept_websocket</span><br><span class="line"><span class="keyword">from</span> uuid <span class="keyword">import</span> uuid1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取最新汇率</span></span><br><span class="line"><span class="keyword">from</span> utils.mk_exchange_rate <span class="keyword">import</span> exchange_rate</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 客户端列表</span></span><br><span class="line">clients = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@accept_websocket</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">websocket_link</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="keyword">if</span> request.is_websocket():</span><br><span class="line"></span><br><span class="line">        uid = <span class="built_in">str</span>(uuid1())</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">			</span><br><span class="line">            <span class="comment"># 接收前端</span></span><br><span class="line">            message = request.websocket.wait()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> message:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">&#x27;websocket链接成功&#x27;</span>)</span><br><span class="line">                <span class="comment"># 存储客户端对象</span></span><br><span class="line">                clients[uid] = request.websocket</span><br><span class="line"></span><br><span class="line">                <span class="comment"># 只要保持连接状态，就循环不停的推送</span></span><br><span class="line">                <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">                    <span class="keyword">if</span> clients:</span><br><span class="line">                        <span class="comment"># 获取最新汇率信息</span></span><br><span class="line">                        res = exchange_rate()</span><br><span class="line">                        data = &#123;<span class="string">&#x27;date&#x27;</span>: res.get(<span class="string">&#x27;date&#x27;</span>), <span class="string">&#x27;exchange_rate&#x27;</span>: res.get(<span class="string">&#x27;exchange_rate&#x27;</span>)&#125;</span><br><span class="line">                        <span class="comment"># 以json格式返回给前端</span></span><br><span class="line">                        clients[uid].send(json.dumps(data))</span><br><span class="line">                        <span class="comment"># 定时60秒循环推送一次</span></span><br><span class="line">                        time.sleep(<span class="number">60</span>)</span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
-
-<p>配置好路由，一切工作做完之后。就只差前端接收数据进行渲染了。需要注意的是，vue端进行渲染的时候数据是分为两个数组。其实从上面的方法中可以看出，需要渲染的数据大概就是这样的</p>
-<p><img src="https://img-blog.csdnimg.cn/20201126234729433.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<p>由此可以看出，我们需要的数据在最终渲染时也是要转换为两个数组，不难看出，带入到我们的demo中，xAxis是时间点，series中是汇率的信息，是不是就好办多了。</p>
-<p>在websocket中的<strong>ws.onmessage</strong>方法获取服务端返回数据</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取服务端返回数据</span></span><br><span class="line">ws.onmessage = <span class="function">(<span class="params">evt</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">// 将获取信息打印</span></span><br><span class="line">    <span class="comment">// console.log(evt.data)</span></span><br><span class="line">    <span class="comment">// console.log(typeof(JSON.parse(evt.data)))</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> data = <span class="built_in">JSON</span>.parse(evt.data)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将返回信息添加到数组末尾</span></span><br><span class="line">    <span class="built_in">this</span>.date.push(data[<span class="string">&#x27;date&#x27;</span>])</span><br><span class="line">    <span class="built_in">this</span>.exchange_rate.push(data[<span class="string">&#x27;exchange_rate&#x27;</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 利用队列的思想</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.date.length &gt; <span class="number">5</span>)&#123;</span><br><span class="line">        <span class="comment">// 删除队列头部元素</span></span><br><span class="line">        <span class="built_in">this</span>.date.shift()</span><br><span class="line">        <span class="built_in">this</span>.exchange_rate.shift()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">this</span>.drawChart()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>由于后端返回的是一个json对象，我们需要把它先解析成为一个对象再从中获取元素，把这两个数组分别当成队列。利用队列的思想，如果数组长度达到上限，我们就在末尾添加的同时删除头部元素，就很好的解决这个问题了。数据接收没问题之后，每次数据更新都进行重新渲染，大功告成！</p>
-<p>结语：在基于ECharts以及websocket协议完成了实时推送汇率动态渲染的功能，不得不说，麻雀虽小五脏俱全，这都是日常学习积累的成果，技术广的同时，将所学知识灵活运用，感觉还是特别棒的！</p>
 ]]></content>
   </entry>
   <entry>
@@ -2186,49 +2133,56 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 ]]></content>
   </entry>
   <entry>
-    <title>权限系统</title>
-    <url>/2020/05/02/%E6%9D%83%E9%99%90%E7%B3%BB%E7%BB%9F/</url>
-    <content><![CDATA[<h2 id="权限系统"><a href="#权限系统" class="headerlink" title="权限系统"></a>权限系统</h2><h3 id="1-什么是权限"><a href="#1-什么是权限" class="headerlink" title="1. 什么是权限"></a>1. 什么是权限</h3><p>说到权限管理，首先要了解，在网站中权限到底是什么？</p>
-<p>在网站中，用户通过URL地址，进入网站的后端逻辑，从而对网站的数据库进行操作管理。如果想要让拥有操作管理权限的用户来完成，而没有权限的用户无法操作.</p>
+    <title>如何基于ECharts的数据可视化实现综合信息分析决策系统</title>
+    <url>/2020/09/26/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8EECharts%E7%9A%84%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96%E5%AE%9E%E7%8E%B0%E7%BB%BC%E5%90%88%E4%BF%A1%E6%81%AF%E5%88%86%E6%9E%90%E5%86%B3%E7%AD%96%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h2 id="如何基于ECharts的数据可视化实现综合信息分析决策系统"><a href="#如何基于ECharts的数据可视化实现综合信息分析决策系统" class="headerlink" title="如何基于ECharts的数据可视化实现综合信息分析决策系统"></a>如何基于ECharts的数据可视化实现综合信息分析决策系统</h2><p>这篇文章我想与大家聊一聊如何快速上手“数据可视化”    神器–Echarts</p>
 <a id="more"></a>
 
-<h3 id="2-ACL权限模型"><a href="#2-ACL权限模型" class="headerlink" title="2. ACL权限模型"></a>2. ACL权限模型</h3><p>规定<strong>资源</strong>可以被哪些<strong>主体</strong>进行哪些<strong>操作</strong></p>
-<p>场景：管理系统</p>
-<p>适用资源：用户管理页面、工单管理页面</p>
-<p>在ACL权限模型下，权限管理是围绕<strong>资源</strong>来设定的。我们可以对不同资源页面设定可以访问的用户。配置形式如下</p>
-<p><img src="https://img-blog.csdnimg.cn/20201203150926733.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<p>在用户量大的情况下，比如将不同的用户视为不同的资源，在动态情况下，权限经常变动，每添加一名员工，都需要配置所有他访问的资源，在频繁变动的大型系统里，是很难维护的。</p>
-<h3 id="3-RBAC基于角色的访问控制"><a href="#3-RBAC基于角色的访问控制" class="headerlink" title="3. RBAC基于角色的访问控制"></a>3. RBAC基于角色的访问控制</h3><ul>
-<li>规定<strong>角色</strong>可以对哪些<strong>资源</strong>进行哪些<strong>操作</strong></li>
-<li>规定<strong>主体</strong>拥有哪些<strong>角色</strong></li>
-</ul>
-<p>还是上面那个场景，比如，将多个用户分配到一个角色下，相当于分组，然后设置哪个角色组拥有哪些节点权限，这种方式，避免了ACL模型下，每次新人入职，需要配置资源表的情况。同样，权限变动也变的很方便，只要修改角色，即可实现用户的权限修改。</p>
-<p><img src="https://img-blog.csdnimg.cn/20201203151001683.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<p>用户和组两个概念可能会让人混淆，区分一下：</p>
+<p>假设我们公司今年盈利两千万，明年盈利三千万。你将这些数据给老板以及投资人看的时候，它是一堆阿拉伯数字，并起不到视觉上的震撼，所以你要是这么做了，那无疑是搬起石头砸自己的脚。这个时候我们就要对数据做可视化了，为了清晰有效地传递信息，数据可视化可以使用统计图形、图表、折线图以及其他工具。对于我们这些数据分析初学者来说，刚好ECharts就可以帮我们来实现这些需求，它是一个使用JavaScript实现的开源可视化库，涵盖各行业图标，废话不多说，我们一起来看。</p>
+<p><strong>为什么要使用ECharts</strong></p>
 <ul>
-<li>角色赋予的是主体，主体可以是用户，也可以是组</li>
-<li>组是用户的集合</li>
+<li>简单、容易上手</li>
+<li>几乎可以满足我们所有的开发需要</li>
+<li>echarts 是国内做的最好的可视化库之一</li>
 </ul>
-]]></content>
-  </entry>
-  <entry>
-    <title>排行榜</title>
-    <url>/2019/02/16/%E6%8E%92%E8%A1%8C%E6%A6%9C/</url>
-    <content><![CDATA[<p>排行榜的底层逻辑就是：有序集合</p>
-<p>集合（set）去重底层逻辑就是：比如捞鱼，一个池子里有好多鱼，我就想把鱼捞出来，过程中我不想要重样的鱼，在准备一个缸，一条一条捞，每一次捞的时候都给那个缸里面的鱼进行作对比，一旦发现有重样的就扔掉，结果这个缸里的鱼都是不重样的。</p>
-<h3 id="数据量大的排行榜用-redis有序集合"><a href="#数据量大的排行榜用-redis有序集合" class="headerlink" title="数据量大的排行榜用 redis有序集合"></a>数据量大的排行榜用 redis有序集合</h3><p><strong>链表（无序）：搜索性能非常差，修改速度特别快</strong><br><strong>数组（有序）：搜索性能特别快，修改速度特别慢  （例子：电影院坐错位置）</strong></p>
-<p>解决链表搜索性能慢问题：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">利用跳表，也可以多重跳表</span><br><span class="line">跳表：运用位于运算分为奇偶数两张表，这样就节约了一半的成本</span><br></pre></td></tr></table></figure>
+<p><strong>如何在Vue项目中使用ECharts。</strong></p>
+<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">npm install echarts --save</span><br></pre></td></tr></table></figure>
 
-<p>二进制判断奇偶数</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2 &amp; 1 &#x3D; 0    #偶数</span><br><span class="line">3 &amp; 1 &#x3D; 1 	  #奇数</span><br></pre></td></tr></table></figure>
+<h4 id="全局引入"><a href="#全局引入" class="headerlink" title="全局引入"></a>全局引入</h4><p>我们安装完成之后，可以在main.js中全局引入echarts</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> echarts <span class="keyword">from</span> <span class="string">&quot;echarts&quot;</span>;</span><br><span class="line">Vue.prototype.$echarts = echarts;</span><br></pre></td></tr></table></figure>
 
+<h4 id="创建图表"><a href="#创建图表" class="headerlink" title="创建图表"></a>创建图表</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div id&#x3D;&quot;app&quot;&gt;</span><br><span class="line">    &lt;div id&#x3D;&quot;main&quot; style&#x3D;&quot;width: 600px;height:400px;&quot;&gt;&lt;&#x2F;div&gt;</span><br><span class="line">  &lt;&#x2F;div&gt;</span><br><span class="line">&lt;&#x2F;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  name: &quot;app&quot;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    drawChart() &#123;</span><br><span class="line">      &#x2F;&#x2F; 基于准备好的dom，初始化echarts实例</span><br><span class="line">      let myChart &#x3D; this.$echarts.init(document.getElementById(&quot;main&quot;));</span><br><span class="line">      &#x2F;&#x2F; 指定图表的配置项和数据</span><br><span class="line">      let option &#x3D; &#123;</span><br><span class="line">        title: &#123;</span><br><span class="line">          text: &quot;ECharts 入门示例&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        tooltip: &#123;&#125;,</span><br><span class="line">        legend: &#123;</span><br><span class="line">          data: [&quot;销量&quot;]</span><br><span class="line">        &#125;,</span><br><span class="line">        xAxis: &#123;</span><br><span class="line">          data: [&quot;衬衫&quot;, &quot;羊毛衫&quot;, &quot;雪纺衫&quot;, &quot;裤子&quot;, &quot;高跟鞋&quot;, &quot;袜子&quot;]</span><br><span class="line">        &#125;,</span><br><span class="line">        yAxis: &#123;&#125;,</span><br><span class="line">        series: [</span><br><span class="line">          &#123;</span><br><span class="line">            name: &quot;销量&quot;,</span><br><span class="line">            type: &quot;bar&quot;,	&#x2F;&#x2F; 柱状图</span><br><span class="line">            data: [5, 20, 36, 10, 10, 20]</span><br><span class="line">          &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;;</span><br><span class="line">      &#x2F;&#x2F; 使用刚指定的配置项和数据显示图表。</span><br><span class="line">      myChart.setOption(option);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted() &#123;</span><br><span class="line">    this.drawChart();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
 
+<p>不出意外的话，此时在页面中就可以看到你的效果了。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201126234935952.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<p>只是这一点简单的代码，就已经实现了一个不可思议的功能，并且它还有很大的可操作性，只需要将方法中的一些固定参数进行动态绑定，如此简单，是不是会感到很惊讶，别着急，精彩的还在后面。</p>
+<p>相信对理财投资比较感兴趣的伙伴都听说过<strong>K线图</strong>这个玩意，科普一下，K线图又称蜡烛图、日本线、阴阳线、棒线等，常用说法是“K线”，起源于日本十八世纪德川幕府时代（1603～1867年）的米市交易，用来计算米价每天的涨跌。这就是K线图的起源及背景，现在已经广泛应用于股票、期货、外汇，期权等证券市场。我们刚入门还是不做这么高大上的了，来做一个美元对人民币汇率兑换实时走势图，其实很好理解，就是一个折线图。先上效果</p>
+<p><img src="https://media.giphy.com/media/864Icf413pw4tkbVem/giphy.gif"></p>
+<p>大致效果就是这样的，它是可以一直动态渲染的，我只给它设定了5个时间段的汇率信息，由于是用来测试，方便查阅效果，在这里我将定时设的短了一点。</p>
+<p>那它的需求是什么呢，就好比用户打开我这个页面，需要查看实时汇率，比如每隔一分钟动态加载一次汇率信息，服务端就需要将前5分钟的信息展示给用户，其实是可以实现的，这里只是一个小demo，就暂且写成这样。</p>
+<hr>
+<h3 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h3><p>第一步，后端需要获取到实时汇率信息，</p>
+<p>可以利用requests定时请求固定资源，这里我是从新浪财经获取到的数据。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">exchange_rate</span>():</span></span><br><span class="line">    url = <span class="string">&#x27;https://hq.sinajs.cn/rn=1606355458081list=fx_susdcny&#x27;</span></span><br><span class="line">    res = requests.get(url=url)</span><br><span class="line">    date = re.search(<span class="string">r&#x27;\d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;&#x27;</span>, res.text).group()</span><br><span class="line">    exchange_rate = re.search(<span class="string">r&#x27;\d.\d&#123;4&#125;&#x27;</span>, res.text).group()</span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">&#x27;date&#x27;</span>: date,</span><br><span class="line">        <span class="string">&#x27;exchange_rate&#x27;</span>: exchange_rate</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据形式：&#123;&#x27;date&#x27;: &#x27;22:10:00&#x27;, &#x27;exchange_rate&#x27;: &#x27;6.5768&#x27;&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p>不多说，上代码</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; zadd myrange 4 uid1</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; zadd myrange 1 uid4</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; zrange myrange 0 10</span><br><span class="line">1) &quot;uid4&quot;</span><br><span class="line">2) &quot;uid1&quot;</span><br></pre></td></tr></table></figure>
+<p>这里写了一个简单的爬虫，由于网站的不同，需要根据个人情况而定，返回的数据大概就是这样的。一个最新的时间以及汇率。</p>
+<h4 id="2-前后端连接websocket"><a href="#2-前后端连接websocket" class="headerlink" title="2. 前后端连接websocket"></a>2. 前后端连接websocket</h4><p>这里还是值得推敲的，我们为什么要使用<strong>websocket</strong>而不用传统的<strong>http</strong>协议呢。</p>
+<p>就我们这个demo来说，使用http，只能是客户端向服务器发出请求，服务器返回查询结果。HTTP 协议做不到服务器主动向客户端推送信息。这种<strong>单向请求</strong>的特点，注定了如果服务器有连续的状态变化，客户端要获知就非常麻烦。我们只能使用<strong>“轮询”</strong>：每隔一段时候，就发出一个询问，了解服务器有没有新的信息。可想而知效率是有多低，这个太low了，我们要用就用高大上的。WebSocket 协议它的最大特点就是，服务器可以主动向客户端推送信息，客户端也可以主动向服务器发送信息，是真正的双向平等对话，属于<strong>服务器推送技术</strong>的一种。</p>
+<p><strong>vue端发起链接请求，页面挂载时调用</strong></p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">link_ws</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="comment">// 判断浏览器是否支持websocket</span></span><br><span class="line">        <span class="function"><span class="title">if</span>(<span class="params"><span class="string">&quot;WebSocket&quot;</span> <span class="keyword">in</span> <span class="built_in">window</span></span>)</span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;支持&quot;</span>)</span><br><span class="line">            <span class="comment">// 生成websocket链接</span></span><br><span class="line">            <span class="keyword">var</span> ws = <span class="keyword">new</span> WebSocket(<span class="string">&#x27;ws://192.168.1.119:8000/websocket_link/&#x27;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 发送链接请求</span></span><br><span class="line">            ws.onopen = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                <span class="comment">// 这里的参数是可以随意改变的，也可以将用户凭证传给后端作为存储对象</span></span><br><span class="line">                ws.send(<span class="string">&#x27;test&#x27;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 获取服务端返回数据</span></span><br><span class="line">            ws.onmessage = <span class="function">(<span class="params">evt</span>)=&gt;</span>&#123;</span><br><span class="line">                <span class="built_in">console</span>.log(evt.data)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 捕获断开链接</span></span><br><span class="line">            ws.onclose = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                <span class="built_in">console</span>.log(<span class="string">&quot;链接已经关闭&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;,</span><br><span class="line"><span class="function"><span class="title">mounted</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.link_ws();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p>这里其实都是websocket使用的一些基本方法，也是简单明了的</p>
+<p><strong>django端接收链接请求并定时主动推送汇率信息</strong></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入dwebsocket的库</span></span><br><span class="line"><span class="keyword">from</span> dwebsocket.decorators <span class="keyword">import</span> accept_websocket</span><br><span class="line"><span class="keyword">from</span> uuid <span class="keyword">import</span> uuid1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取最新汇率</span></span><br><span class="line"><span class="keyword">from</span> utils.mk_exchange_rate <span class="keyword">import</span> exchange_rate</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 客户端列表</span></span><br><span class="line">clients = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@accept_websocket</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">websocket_link</span>(<span class="params">request</span>):</span></span><br><span class="line">    <span class="keyword">if</span> request.is_websocket():</span><br><span class="line"></span><br><span class="line">        uid = <span class="built_in">str</span>(uuid1())</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">			</span><br><span class="line">            <span class="comment"># 接收前端</span></span><br><span class="line">            message = request.websocket.wait()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> message:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">&#x27;websocket链接成功&#x27;</span>)</span><br><span class="line">                <span class="comment"># 存储客户端对象</span></span><br><span class="line">                clients[uid] = request.websocket</span><br><span class="line"></span><br><span class="line">                <span class="comment"># 只要保持连接状态，就循环不停的推送</span></span><br><span class="line">                <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">                    <span class="keyword">if</span> clients:</span><br><span class="line">                        <span class="comment"># 获取最新汇率信息</span></span><br><span class="line">                        res = exchange_rate()</span><br><span class="line">                        data = &#123;<span class="string">&#x27;date&#x27;</span>: res.get(<span class="string">&#x27;date&#x27;</span>), <span class="string">&#x27;exchange_rate&#x27;</span>: res.get(<span class="string">&#x27;exchange_rate&#x27;</span>)&#125;</span><br><span class="line">                        <span class="comment"># 以json格式返回给前端</span></span><br><span class="line">                        clients[uid].send(json.dumps(data))</span><br><span class="line">                        <span class="comment"># 定时60秒循环推送一次</span></span><br><span class="line">                        time.sleep(<span class="number">60</span>)</span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
 
+<p>配置好路由，一切工作做完之后。就只差前端接收数据进行渲染了。需要注意的是，vue端进行渲染的时候数据是分为两个数组。其实从上面的方法中可以看出，需要渲染的数据大概就是这样的</p>
+<p><img src="https://img-blog.csdnimg.cn/20201126234729433.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<p>由此可以看出，我们需要的数据在最终渲染时也是要转换为两个数组，不难看出，带入到我们的demo中，xAxis是时间点，series中是汇率的信息，是不是就好办多了。</p>
+<p>在websocket中的<strong>ws.onmessage</strong>方法获取服务端返回数据</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取服务端返回数据</span></span><br><span class="line">ws.onmessage = <span class="function">(<span class="params">evt</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">// 将获取信息打印</span></span><br><span class="line">    <span class="comment">// console.log(evt.data)</span></span><br><span class="line">    <span class="comment">// console.log(typeof(JSON.parse(evt.data)))</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> data = <span class="built_in">JSON</span>.parse(evt.data)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将返回信息添加到数组末尾</span></span><br><span class="line">    <span class="built_in">this</span>.date.push(data[<span class="string">&#x27;date&#x27;</span>])</span><br><span class="line">    <span class="built_in">this</span>.exchange_rate.push(data[<span class="string">&#x27;exchange_rate&#x27;</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 利用队列的思想</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.date.length &gt; <span class="number">5</span>)&#123;</span><br><span class="line">        <span class="comment">// 删除队列头部元素</span></span><br><span class="line">        <span class="built_in">this</span>.date.shift()</span><br><span class="line">        <span class="built_in">this</span>.exchange_rate.shift()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">this</span>.drawChart()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于后端返回的是一个json对象，我们需要把它先解析成为一个对象再从中获取元素，把这两个数组分别当成队列。利用队列的思想，如果数组长度达到上限，我们就在末尾添加的同时删除头部元素，就很好的解决这个问题了。数据接收没问题之后，每次数据更新都进行重新渲染，大功告成！</p>
+<p>结语：在基于ECharts以及websocket协议完成了实时推送汇率动态渲染的功能，不得不说，麻雀虽小五脏俱全，这都是日常学习积累的成果，技术广的同时，将所学知识灵活运用，感觉还是特别棒的！</p>
 ]]></content>
   </entry>
   <entry>
@@ -2491,6 +2445,52 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
       </tags>
   </entry>
   <entry>
+    <title>排行榜</title>
+    <url>/2019/02/16/%E6%8E%92%E8%A1%8C%E6%A6%9C/</url>
+    <content><![CDATA[<p>排行榜的底层逻辑就是：有序集合</p>
+<p>集合（set）去重底层逻辑就是：比如捞鱼，一个池子里有好多鱼，我就想把鱼捞出来，过程中我不想要重样的鱼，在准备一个缸，一条一条捞，每一次捞的时候都给那个缸里面的鱼进行作对比，一旦发现有重样的就扔掉，结果这个缸里的鱼都是不重样的。</p>
+<h3 id="数据量大的排行榜用-redis有序集合"><a href="#数据量大的排行榜用-redis有序集合" class="headerlink" title="数据量大的排行榜用 redis有序集合"></a>数据量大的排行榜用 redis有序集合</h3><p><strong>链表（无序）：搜索性能非常差，修改速度特别快</strong><br><strong>数组（有序）：搜索性能特别快，修改速度特别慢  （例子：电影院坐错位置）</strong></p>
+<p>解决链表搜索性能慢问题：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">利用跳表，也可以多重跳表</span><br><span class="line">跳表：运用位于运算分为奇偶数两张表，这样就节约了一半的成本</span><br></pre></td></tr></table></figure>
+
+<p>二进制判断奇偶数</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2 &amp; 1 &#x3D; 0    #偶数</span><br><span class="line">3 &amp; 1 &#x3D; 1 	  #奇数</span><br></pre></td></tr></table></figure>
+
+
+
+<p>不多说，上代码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; zadd myrange 4 uid1</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; zadd myrange 1 uid4</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; zrange myrange 0 10</span><br><span class="line">1) &quot;uid4&quot;</span><br><span class="line">2) &quot;uid1&quot;</span><br></pre></td></tr></table></figure>
+
+
+]]></content>
+  </entry>
+  <entry>
+    <title>权限系统</title>
+    <url>/2020/05/02/%E6%9D%83%E9%99%90%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h2 id="权限系统"><a href="#权限系统" class="headerlink" title="权限系统"></a>权限系统</h2><h3 id="1-什么是权限"><a href="#1-什么是权限" class="headerlink" title="1. 什么是权限"></a>1. 什么是权限</h3><p>说到权限管理，首先要了解，在网站中权限到底是什么？</p>
+<p>在网站中，用户通过URL地址，进入网站的后端逻辑，从而对网站的数据库进行操作管理。如果想要让拥有操作管理权限的用户来完成，而没有权限的用户无法操作.</p>
+<a id="more"></a>
+
+<h3 id="2-ACL权限模型"><a href="#2-ACL权限模型" class="headerlink" title="2. ACL权限模型"></a>2. ACL权限模型</h3><p>规定<strong>资源</strong>可以被哪些<strong>主体</strong>进行哪些<strong>操作</strong></p>
+<p>场景：管理系统</p>
+<p>适用资源：用户管理页面、工单管理页面</p>
+<p>在ACL权限模型下，权限管理是围绕<strong>资源</strong>来设定的。我们可以对不同资源页面设定可以访问的用户。配置形式如下</p>
+<p><img src="https://img-blog.csdnimg.cn/20201203150926733.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<p>在用户量大的情况下，比如将不同的用户视为不同的资源，在动态情况下，权限经常变动，每添加一名员工，都需要配置所有他访问的资源，在频繁变动的大型系统里，是很难维护的。</p>
+<h3 id="3-RBAC基于角色的访问控制"><a href="#3-RBAC基于角色的访问控制" class="headerlink" title="3. RBAC基于角色的访问控制"></a>3. RBAC基于角色的访问控制</h3><ul>
+<li>规定<strong>角色</strong>可以对哪些<strong>资源</strong>进行哪些<strong>操作</strong></li>
+<li>规定<strong>主体</strong>拥有哪些<strong>角色</strong></li>
+</ul>
+<p>还是上面那个场景，比如，将多个用户分配到一个角色下，相当于分组，然后设置哪个角色组拥有哪些节点权限，这种方式，避免了ACL模型下，每次新人入职，需要配置资源表的情况。同样，权限变动也变的很方便，只要修改角色，即可实现用户的权限修改。</p>
+<p><img src="https://img-blog.csdnimg.cn/20201203151001683.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<p>用户和组两个概念可能会让人混淆，区分一下：</p>
+<ul>
+<li>角色赋予的是主体，主体可以是用户，也可以是组</li>
+<li>组是用户的集合</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
     <title>注册功能+邮件验证</title>
     <url>/2018/09/01/%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%83%BD-%E9%82%AE%E4%BB%B6%E9%AA%8C%E8%AF%81/</url>
     <content><![CDATA[<h2 id="django实现注册模块"><a href="#django实现注册模块" class="headerlink" title="django实现注册模块"></a>django实现注册模块</h2><p>这篇文章主要介绍了Python Django 实现简单注册功能过程详解,文中通过示例代码介绍的非常详细，对大家的学习或者工作具有一定的参考学习价值,需要的朋友可以参考下</p>
@@ -2546,6 +2546,22 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
 <li>全表重新加载：一些数据库，如数据仓库，分段或接口数据库，需要经常从外部重新加载数据。这会导致重新加载时数据不一致</li>
 <li>拓展性的限制：如果用了物理外键，你会遵守这个规矩去干活。但是计划赶不上变化，万一那天主键所在表需要拆分了，需要重构了，这种情况并不少见，尤其是数据库设计者水平不够高的情况下。另一方面，数据表之间有了级联关系，极有可能会限制开发者的思维逻辑，导致思路不清晰</li>
 </ul>
+]]></content>
+  </entry>
+  <entry>
+    <title>解决vscode报错Module &#39;cv2&#39; has no &#39;imread&#39; memberpylint(no-member)</title>
+    <url>/2019/09/23/%E8%A7%A3%E5%86%B3vscode%E6%8A%A5%E9%94%99Module-cv2-has-no-imread-memberpylint-no-member/</url>
+    <content><![CDATA[<h3 id="解决vscode报错”Module-‘cv2’-has-no-‘imread’-memberpylint-no-member-”"><a href="#解决vscode报错”Module-‘cv2’-has-no-‘imread’-memberpylint-no-member-”" class="headerlink" title="解决vscode报错”Module ‘cv2’ has no ‘imread’ memberpylint(no-member)”"></a>解决vscode报错”Module ‘cv2’ has no ‘imread’ memberpylint(no-member)”</h3><p>先来看以下场景</p>
+<p>每个调用cv2的地方都出现了红色下划线，显示Module ‘cv2’ has no ‘xxx’ member，如下</p>
+<a id="more"></a>
+
+<p><img src="https://img-blog.csdnimg.cn/20201124224942528.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
+<p>这一点简单的代码在vscode上会报 Module ‘cv2’ has no ‘imshow’ member 的错误，其实代码是没有错的，可以直接运行，是因为vscode的插件检测不到opencv模块</p>
+<p>解决办法：</p>
+<p>在settings.json中增加代码</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&quot;python.linting.pylintArgs&quot;: [&quot;--generate-members&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>这样VScode就不会出现烦人的红色波浪线了,虽然说这红色的波浪线对代码没有影响,但是对于有强迫症的人来说确实真的不舒服。</p>
 ]]></content>
   </entry>
   <entry>
@@ -2631,22 +2647,6 @@ decode_jwt = jwt.decode(&#39;encode_str&#39;, &#39;test&#39;, algorithms=[&#39;H
       <tags>
         <tag>好</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>解决vscode报错Module &#39;cv2&#39; has no &#39;imread&#39; memberpylint(no-member)</title>
-    <url>/2019/09/23/%E8%A7%A3%E5%86%B3vscode%E6%8A%A5%E9%94%99Module-cv2-has-no-imread-memberpylint-no-member/</url>
-    <content><![CDATA[<h3 id="解决vscode报错”Module-‘cv2’-has-no-‘imread’-memberpylint-no-member-”"><a href="#解决vscode报错”Module-‘cv2’-has-no-‘imread’-memberpylint-no-member-”" class="headerlink" title="解决vscode报错”Module ‘cv2’ has no ‘imread’ memberpylint(no-member)”"></a>解决vscode报错”Module ‘cv2’ has no ‘imread’ memberpylint(no-member)”</h3><p>先来看以下场景</p>
-<p>每个调用cv2的地方都出现了红色下划线，显示Module ‘cv2’ has no ‘xxx’ member，如下</p>
-<a id="more"></a>
-
-<p><img src="https://img-blog.csdnimg.cn/20201124224942528.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Njg0OTYyNw==,size_16,color_FFFFFF,t_70#pic_center"></p>
-<p>这一点简单的代码在vscode上会报 Module ‘cv2’ has no ‘imshow’ member 的错误，其实代码是没有错的，可以直接运行，是因为vscode的插件检测不到opencv模块</p>
-<p>解决办法：</p>
-<p>在settings.json中增加代码</p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&quot;python.linting.pylintArgs&quot;: [&quot;--generate-members&quot;]</span><br></pre></td></tr></table></figure>
-
-<p>这样VScode就不会出现烦人的红色波浪线了,虽然说这红色的波浪线对代码没有影响,但是对于有强迫症的人来说确实真的不舒服。</p>
-]]></content>
   </entry>
   <entry>
     <title>那些年让你迷惑的多任务、并行、并发、多线程、多进程</title>
