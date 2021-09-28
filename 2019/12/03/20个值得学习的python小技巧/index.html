@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    20个值得学习的python小技巧 |  李政一的技术博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/source/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      <canvas class="fireworks"></canvas>
+      <style>
+        .fireworks {
+          position: fixed;
+          left: 0;
+          top: 0;
+          z-index: 99999;
+          pointer-events: none;
+        }
+      </style>
+      
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-20个值得学习的python小技巧"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  20个值得学习的python小技巧
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2019/12/03/20%E4%B8%AA%E5%80%BC%E5%BE%97%E5%AD%A6%E4%B9%A0%E7%9A%84python%E5%B0%8F%E6%8A%80%E5%B7%A7/" class="article-date">
+  <time datetime="2019-12-02T16:39:39.000Z" itemprop="datePublished">2019-12-03</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.5k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">6 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <ol>
+<li><p><strong>使用切片反转字符串</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">str1=<span class="string">&quot;qwert&quot;</span> </span><br><span class="line">rev_str1=str1[::<span class="number">-1</span>] </span><br><span class="line"><span class="comment">#输出  </span></span><br><span class="line"><span class="comment"># trewq</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<a id="more"></a>
+
+<ol start="2">
+<li><p><strong>使首字母大写：title()方法</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">str1=<span class="string">&quot;this is a book&quot;</span> </span><br><span class="line">print(str1.title()) </span><br><span class="line"><span class="comment"># This Is A Book</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>在字符串中查找所有的唯一元素</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">str1=<span class="string">&quot;aabbccccdddd&quot;</span></span><br><span class="line">set1=<span class="built_in">set</span>(str1) </span><br><span class="line">new_str=<span class="string">&#x27;&#x27;</span>.join(set1) </span><br><span class="line">print(new_str)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>重复打印字符串或列表</strong></p>
+<p>下面的代码中，对字符串或列表使用（*）。把字符串或列表复制多次。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">i=<span class="number">4</span> </span><br><span class="line">str1=<span class="string">&quot;abcd&quot;</span> </span><br><span class="line">list1=[<span class="number">1</span>,<span class="number">2</span>] </span><br><span class="line">print(str1*i) </span><br><span class="line"><span class="comment"># abcdabcdabcdabcd  </span></span><br><span class="line">print(list1*i) </span><br><span class="line"><span class="comment"># [1,2,1,2,1,2,1,2]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>列表推导式</strong></p>
+<p>列表推导式为我们提供了一种在其他列表基础上创建列表的好方法。</p>
+<p>将旧列表的每个元素乘以 2 来创建新列表。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">list1 = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>] </span><br><span class="line">new_list1 = [<span class="number">2</span>*i <span class="keyword">for</span> i <span class="keyword">in</span> list1] </span><br><span class="line"><span class="comment"># [2,4,6]</span></span><br></pre></td></tr></table></figure>
+
+<p>推导式配合range生成一个列表</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a_list = [i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="number">11</span>)]</span><br><span class="line">print(a_list)</span><br><span class="line"><span class="comment"># [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>交换变量</strong></p>
+<p>不使用另一个变量，实现变量交换</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">x=<span class="number">1</span> </span><br><span class="line">y=<span class="number">2</span> </span><br><span class="line">x, y = y, x </span><br><span class="line">print(x) <span class="comment"># 2  </span></span><br><span class="line">print(y) <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>将字符串拆分为子字符串列表(分割字符串)</strong></p>
+<p>我们使用字符串类中的.split（）方法将字符串拆分为子字符串列表，还可以将要分割的分隔符作为参数传递。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">str1 = <span class="string">&quot;This is a book&quot;</span></span><br><span class="line">str2 = <span class="string">&quot;test/ str 2&quot;</span></span><br><span class="line">print(str1.split()) <span class="comment"># [&#x27;This&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;book&#x27;] </span></span><br><span class="line">print(str2.split(<span class="string">&#x27;/&#x27;</span>)) <span class="comment"># [&#x27;test&#x27;, &#x27; str 2&#x27;]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>将字符串列表组合成单个字符串(拼接字符串)</strong></p>
+<p>join（）将作为参数传递的字符串列表组合为单个字符串。这种情况下，我们使用逗号分隔符将它们分开。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">list_str=[<span class="string">&#x27;This&#x27;</span>, <span class="string">&#x27;is&#x27;</span>, <span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;book&#x27;</span>]</span><br><span class="line">print(<span class="string">&#x27;,&#x27;</span>.join(list_str))</span><br><span class="line"><span class="comment"># This,is,a,book</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>检查回文字符串</strong></p>
+<p>我们已经讨论过如何反转字符串，因此回文字符串在 Python 中判断起来非常简单。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">str1=<span class="string">&quot;qqaabb&quot;</span></span><br><span class="line"><span class="keyword">if</span> str1==str1[::<span class="number">-1</span>]:</span><br><span class="line">  print(<span class="string">&quot;回文&quot;</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">  print(<span class="string">&quot;不是&quot;</span>)</span><br><span class="line">  <span class="comment"># 不是</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>列表中的元素统计</strong></p>
+<p>使用 Python Counter 类。Python 计数器跟踪容器中每个元素的频数， Counter()返回一个字典，元素作为键，频数作为值。</p>
+<p>另外使用 most_common()函数来获取列表中的 出现次数最多的元素。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line">list1 = [<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;b&#x27;</span>,<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;c&#x27;</span>,<span class="string">&#x27;c&#x27;</span>,<span class="string">&#x27;c&#x27;</span>]</span><br><span class="line">count = Counter(list1)</span><br><span class="line">print(count)	<span class="comment"># Counter(&#123;&#x27;c&#x27;: 3, &#x27;a&#x27;: 2, &#x27;b&#x27;: 1&#125;)</span></span><br><span class="line">print(count[<span class="string">&#x27;b&#x27;</span>])	<span class="comment"># 1</span></span><br><span class="line">print(count.most_common(<span class="number">1</span>))		<span class="comment"># [(&#x27;c&#x27;, 3)]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>判断两个字符串是否为异序词</strong></p>
+<p>异序词是通过重新排列不同单词或短语的字母而形成的单词或短语。如果两个字符串的 Counter 对象相等，那么它们就是相同字母异序词对。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">s1, s2, s3 = <span class="string">&quot;acbde&quot;</span>, <span class="string">&quot;abced&quot;</span>, <span class="string">&quot;abcda&quot;</span></span><br><span class="line">c1, c2, c3 = Counter(s1), Counter(s2), Counter(s3)</span><br><span class="line">print(c1)</span><br><span class="line">print(c2)</span><br><span class="line">print(c3)</span><br><span class="line"><span class="keyword">if</span> c1 == c2:</span><br><span class="line">  print(<span class="string">&#x27;1和2是异序词&#x27;</span>)</span><br><span class="line"><span class="keyword">if</span> c1 == c3:</span><br><span class="line">   print(<span class="string">&#x27;1和3是异序词&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># c1：Counter(&#123;&#x27;a&#x27;: 1, &#x27;c&#x27;: 1, &#x27;b&#x27;: 1, &#x27;d&#x27;: 1, &#x27;e&#x27;: 1&#125;)</span></span><br><span class="line"><span class="comment"># c2：Counter(&#123;&#x27;a&#x27;: 1, &#x27;b&#x27;: 1, &#x27;c&#x27;: 1, &#x27;e&#x27;: 1, &#x27;d&#x27;: 1&#125;)</span></span><br><span class="line"><span class="comment"># c3：Counter(&#123;&#x27;a&#x27;: 2, &#x27;b&#x27;: 1, &#x27;c&#x27;: 1, &#x27;d&#x27;: 1&#125;)</span></span><br><span class="line"><span class="comment"># 1和2是异序词</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>异常捕获：try-except-else</strong></p>
+<p>try / except 是 Python 中的异常处理模块，添加 else 语句，会在 try 块中没有引发异常的情况下运行。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">a, b = <span class="number">1</span>, <span class="number">0</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    print(a/b)</span><br><span class="line">    <span class="comment"># b为0的时候触发异常</span></span><br><span class="line"><span class="keyword">except</span> ZeroDivisionError:</span><br><span class="line">    print(<span class="string">&quot;除数为0&quot;</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">&quot;不存在异常&quot;</span>)</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    print(<span class="string">&quot;此段总是会执行&quot;</span>)</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 除数为0</span></span><br><span class="line"><span class="comment"># 此段总是会执行</span></span><br></pre></td></tr></table></figure>
+
+<p>又涨知识了，在python中除0时会抛出异常：ZeroDivisionError</p>
+</li>
+<li><p><strong>通过枚举获取索引 / 值对</strong></p>
+<p>遍历列表中的值及其索引。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">list1 = [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;c&#x27;</span>, <span class="string">&#x27;d&#x27;</span>, <span class="string">&#x27;e&#x27;</span>]</span><br><span class="line"><span class="keyword">for</span> idx, val <span class="keyword">in</span> <span class="built_in">enumerate</span>(list1):</span><br><span class="line">    print(<span class="string">&#x27;&#123;0&#125;:&#123;1&#125;&#x27;</span>.<span class="built_in">format</span>(idx, val))</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 0:a</span></span><br><span class="line"><span class="comment"># 1:b</span></span><br><span class="line"><span class="comment"># 2:c</span></span><br><span class="line"><span class="comment"># 3:d</span></span><br><span class="line"><span class="comment"># 4:e</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>获取对象的内存使用信息，引用计数</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">a = <span class="number">1</span></span><br><span class="line"><span class="comment"># 查看占用内存大小</span></span><br><span class="line">print(sys.getsizeof(a))</span><br><span class="line"><span class="comment"># 查看该对象的引用计数次数</span></span><br><span class="line">print(sys.getrefcount(a))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>合并两个字典</strong></p>
+<p>在 Python 2 中，使用 update（）合并两个字典，Python 3 变得更加简单。</p>
+<p>下面脚本中，两个字典被合并。在相交的情况下，使用第二个字典中的值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dic1 = &#123;<span class="string">&#x27;app&#x27;</span>:<span class="number">9</span>,<span class="string">&#x27;banana&#x27;</span>:<span class="number">6</span>&#125;</span><br><span class="line">dic2 = &#123;<span class="string">&#x27;banana&#x27;</span>:<span class="number">4</span>,<span class="string">&#x27;orange&#x27;</span>:<span class="number">8</span>&#125;</span><br><span class="line">com_dict = &#123;**dic1, **dic2&#125;</span><br><span class="line"><span class="comment"># &#123;&#x27;apple&#x27;:9,&#x27;banana&#x27;:4,&#x27;orange&#x27;:8&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>计算代码执行所需的时间</strong></p>
+<p>使用time模块来计算执行代码所需的时间消耗多少毫秒。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line">s_time=time.time()</span><br><span class="line">a,b=<span class="number">1</span>,<span class="number">2</span></span><br><span class="line">c=a+b </span><br><span class="line">e_time=time.time()</span><br><span class="line">time_taken_in_micro=(e_time-s_time)*(<span class="number">10</span>**<span class="number">6</span>)</span><br><span class="line">print(<span class="string">&quot;程序运行的毫秒：&#123;0&#125; ms&quot;</span>.<span class="built_in">format</span>(time_taken_in_micro)) </span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>从列表中随机取样</strong></p>
+<p>从给定列表中生成了 n 个随机样本。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line">list1 = [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;c&#x27;</span>, <span class="string">&#x27;d&#x27;</span>, <span class="string">&#x27;e&#x27;</span>]</span><br><span class="line">ns = <span class="number">2</span></span><br><span class="line">samples = random.sample(list1, ns)</span><br><span class="line">print(samples)</span><br><span class="line">[<span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;d&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>或者使用secrets库生成随机样本进行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> secrets</span><br><span class="line">s_rand = secrets.SystemRandom()</span><br><span class="line">list1 = [<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;b&#x27;</span>,<span class="string">&#x27;c&#x27;</span>,<span class="string">&#x27;d&#x27;</span>,<span class="string">&#x27;e&#x27;</span>]</span><br><span class="line">ns = <span class="number">2</span></span><br><span class="line">samples = s_rand.sample(list1,ns)</span><br><span class="line">print(samples)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>数字列表化</strong></p>
+<p>将整数转换为数字列表。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">nums = <span class="number">123456</span></span><br><span class="line"><span class="comment"># 使用map</span></span><br><span class="line">digit_list = <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="built_in">int</span>, <span class="built_in">str</span>(nums)))</span><br><span class="line">print(digit_list)</span><br><span class="line"><span class="comment"># [1,2,3,4,5,6]</span></span><br><span class="line"><span class="comment"># 使用列表表达式</span></span><br><span class="line">digit_list = [<span class="built_in">int</span>(x) <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">str</span>(nums)]</span><br><span class="line">print(digit_list)</span><br><span class="line"><span class="comment"># [1,2,3,4,5,6]</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>唯一性检查</strong></p>
+<p>利用set特性检查列表中的元素是否唯一。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unique</span>(<span class="params">l</span>):</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(l) == <span class="built_in">len</span>(<span class="built_in">set</span>(l)):</span><br><span class="line">      print(<span class="string">&quot;所有元素是唯一的&quot;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      print(<span class="string">&quot;存在重复&quot;</span>)</span><br><span class="line">unique([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>])</span><br><span class="line"> <span class="comment"># 所有元素是唯一的</span></span><br><span class="line">unique([<span class="number">1</span>,<span class="number">1</span>,<span class="number">3</span>,<span class="number">4</span>])</span><br><span class="line"> <span class="comment"># 存在重复</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>“指针”解包操作</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">list_a = [<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;b&#x27;</span>,<span class="string">&#x27;c&#x27;</span>]</span><br><span class="line">list_b = [<span class="string">&#x27;d&#x27;</span>,<span class="string">&#x27;e&#x27;</span>,<span class="string">&#x27;f&#x27;</span>,<span class="string">&#x27;g&#x27;</span>]</span><br><span class="line">list_ab = [*list_a, *list_b]</span><br><span class="line">print(list_ab)</span><br><span class="line"><span class="comment"># [&#x27;a&#x27;, &#x27;b&#x27;, &#x27;c&#x27;, &#x27;d&#x27;, &#x27;e&#x27;, &#x27;f&#x27;, &#x27;g&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/1092093583/1092093583.github.io/2019/12/03/20%E4%B8%AA%E5%80%BC%E5%BE%97%E5%AD%A6%E4%B9%A0%E7%9A%84python%E5%B0%8F%E6%8A%80%E5%B7%A7/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2019/12/22/%E9%82%A3%E4%BA%9B%E5%B9%B4%E8%AE%A9%E4%BD%A0%E8%BF%B7%E6%83%91%E7%9A%84%E5%A4%9A%E4%BB%BB%E5%8A%A1%E3%80%81%E5%B9%B6%E8%A1%8C%E3%80%81%E5%B9%B6%E5%8F%91%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E3%80%81%E5%A4%9A%E8%BF%9B%E7%A8%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            那些年让你迷惑的多任务、并行、并发、多线程、多进程
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/11/20/celery%E4%BB%8B%E7%BB%8D/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">celery介绍</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2021
+        <i class="ri-heart-fill heart_icon"></i> 李 政 一
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/666.jpg" alt="李政一的技术博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">旅行</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">摄影</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script>
+
+<script src="/js/clickBoom1.js"></script>
+
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"center","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+
+</html>

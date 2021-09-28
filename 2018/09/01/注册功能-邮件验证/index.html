@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    注册功能+邮件验证 |  李政一的技术博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/source/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      <canvas class="fireworks"></canvas>
+      <style>
+        .fireworks {
+          position: fixed;
+          left: 0;
+          top: 0;
+          z-index: 99999;
+          pointer-events: none;
+        }
+      </style>
+      
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-注册功能-邮件验证"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  注册功能+邮件验证
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2018/09/01/%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%83%BD-%E9%82%AE%E4%BB%B6%E9%AA%8C%E8%AF%81/" class="article-date">
+  <time datetime="2018-09-01T13:54:20.000Z" itemprop="datePublished">2018-09-01</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.1k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">5 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="django实现注册模块"><a href="#django实现注册模块" class="headerlink" title="django实现注册模块"></a>django实现注册模块</h2><p>这篇文章主要介绍了Python Django 实现简单注册功能过程详解,文中通过示例代码介绍的非常详细，对大家的学习或者工作具有一定的参考学习价值,需要的朋友可以参考下</p>
+<a id="more"></a>
+
+<h3 id="1-用户模型设计：models-py"><a href="#1-用户模型设计：models-py" class="headerlink" title="1. 用户模型设计：models.py"></a>1. 用户模型设计：<code>models.py</code></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建基类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>(<span class="params">models.Model</span>):</span></span><br><span class="line">    <span class="comment"># 创建时间</span></span><br><span class="line">    create_time = models.DateTimeField(default=timezone.now, null=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        abstract = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span>(<span class="params">Base</span>):</span></span><br><span class="line">    <span class="built_in">id</span> = models.AutoField(primary_key=<span class="literal">True</span>)</span><br><span class="line">    username = models.CharField(max_length=<span class="number">100</span>)</span><br><span class="line">    password = models.CharField(max_length=<span class="number">200</span>)</span><br><span class="line">    phone = models.CharField(max_length=<span class="number">50</span>)</span><br><span class="line">    email = models.CharField(max_length=<span class="number">50</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">&#x27;user&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>需要注意：注册过程中需要判断用户名是否存在，但是做大型项目的话，读取数据库是非常不现实的，我们需要给username加一个unique索引，在完成校验后直接入库，如果有异常的话，就是username已存在，可以利用异常捕获来处理，减轻数据库压力。</p>
+<h3 id="2-注册页面"><a href="#2-注册页面" class="headerlink" title="2. 注册页面"></a>2. 注册页面</h3> <img src=".\images\注册页面.png" style="zoom:67%;" />
+
+<p>需要注意：在用户填写好表单信息之后，需要利用邮箱验证，首先要点击按钮，触发发邮件接口，详见下文</p>
+<h3 id="3-辅助工具"><a href="#3-辅助工具" class="headerlink" title="3. 辅助工具"></a>3. 辅助工具</h3><ul>
+<li><p>redis缓存</p>
+</li>
+<li><p>send_email脚本</p>
+</li>
+<li><p>md5加密：</p>
+<p>md5加密后是不可逆的，用到的是hashlib库</p>
+<p>注册时需要将password制作成md5密文，并且登录进行比对时也需要先将用户输入的pwd加密</p>
+</li>
+</ul>
+<h4 id="3-1-utils-send-email-py-发送邮件验证码"><a href="#3-1-utils-send-email-py-发送邮件验证码" class="headerlink" title="3.1 utils/send_email.py  发送邮件验证码"></a>3.1 <code>utils/send_email.py</code>  发送邮件验证码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"><span class="keyword">from</span> email.mime.text <span class="keyword">import</span> MIMEText</span><br><span class="line"><span class="keyword">from</span> email.utils <span class="keyword">import</span> formataddr</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 发送方</span></span><br><span class="line">my_mail = <span class="string">&quot;xxxxxxxx@qq.com&quot;</span></span><br><span class="line"><span class="comment"># 授权码(qq邮箱的授权码)</span></span><br><span class="line">my_pass = <span class="string">&quot;tgwczatezutohhej&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义发送邮件的方法</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mail</span>(<span class="params">subject, content, mailaddr</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    :param subject: 标题</span></span><br><span class="line"><span class="string">    :param content: 发送内容</span></span><br><span class="line"><span class="string">    :param mailaddr: 接收方邮箱</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 声明邮件对象</span></span><br><span class="line">    msg = MIMEText(content, <span class="string">&#x27;plain&#x27;</span>, <span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 设置发送发对象</span></span><br><span class="line">    msg[<span class="string">&#x27;From&#x27;</span>] = formataddr([<span class="string">&#x27;在线教育平台&#x27;</span>, my_mail])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 设置收件方对象</span></span><br><span class="line">    msg[<span class="string">&#x27;To&#x27;</span>] = formataddr([<span class="string">&#x27;尊敬的客户&#x27;</span>, mailaddr])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 设置标题</span></span><br><span class="line">    msg[<span class="string">&#x27;Subject&#x27;</span>] = subject</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 设置smtp服务器</span></span><br><span class="line">    server = smtplib.SMTP_SSL(<span class="string">&quot;smtp.qq.com&quot;</span>, <span class="number">465</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 登录邮箱</span></span><br><span class="line">    server.login(my_mail, my_pass)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 发送邮件</span></span><br><span class="line">    server.sendmail(my_mail, [mailaddr], msg.as_string())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 关闭smtp链接</span></span><br><span class="line">    server.quit()</span><br><span class="line"></span><br><span class="line">mail(<span class="string">&#x27;验证码验证服务&#x27;</span>, <span class="string">&#x27;6666&#x27;</span>, <span class="string">&#x27;xxxxxx@qq.com&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-utils-redis-cache-py-利用redis缓存并设置验证码有效期"><a href="#3-2-utils-redis-cache-py-利用redis缓存并设置验证码有效期" class="headerlink" title="3.2 utils/redis_cache.py   利用redis缓存并设置验证码有效期"></a>3.2 <code>utils/redis_cache.py </code>  利用redis缓存并设置验证码有效期</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 链接</span></span><br><span class="line">r = redis.Redis(host=<span class="string">&#x27;localhost&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将邮箱验证码存入redis，设置有效期</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">email_cache</span>(<span class="params">email, code</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 设置值</span></span><br><span class="line">    r.<span class="built_in">set</span>(email, code)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 设置有效期</span></span><br><span class="line">    r.expire(email, <span class="number">3000</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> r.ttl(email)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将用户输入的验证码与redis中的缓存比对</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">email_code</span>(<span class="params">email, code</span>):</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        res = r.get(email)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    res = <span class="built_in">str</span>(res, <span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> res == code:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-views-py-发送邮件验证码接口"><a href="#3-3-views-py-发送邮件验证码接口" class="headerlink" title="3.3 views.py  发送邮件验证码接口"></a>3.3 <code>views.py</code>  发送邮件验证码接口</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> utils.send_email <span class="keyword">import</span> mail</span><br><span class="line"><span class="keyword">from</span> utils.redis_cache <span class="keyword">import</span> email_cache, email_code</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SendEmail</span>(<span class="params">APIView</span>):</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line"></span><br><span class="line">		<span class="comment"># 接收参数</span></span><br><span class="line">		username = request.POST.get(<span class="string">&#x27;username&#x27;</span>)</span><br><span class="line">		email = request.POST.get(<span class="string">&#x27;email&#x27;</span>)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 校验邮箱合法性</span></span><br><span class="line">		<span class="keyword">if</span> <span class="keyword">not</span> re.match(<span class="string">r&#x27;[0-9a-zA-Z_]&#123;0,19&#125;@(.*?).com$&#x27;</span>, email):</span><br><span class="line">			<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;邮箱不合法&#x27;</span>&#125;)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 判断是否发送频繁</span></span><br><span class="line">		<span class="keyword">if</span> r.get(email):</span><br><span class="line">			<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;发送频繁&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">400</span>&#125;)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 生成随机验证码</span></span><br><span class="line">		code = <span class="built_in">str</span>(random.randint(<span class="number">1000</span>, <span class="number">9999</span>))</span><br><span class="line"></span><br><span class="line">		content = <span class="string">&quot;尊敬的&quot;</span> + username + <span class="string">&quot;,您的验证码为：&quot;</span> + code + <span class="string">&quot;,有效期为5分钟&quot;</span></span><br><span class="line"></span><br><span class="line">		<span class="comment"># 将生成的随机验证码存入redis，email为key，code为value</span></span><br><span class="line">		email_cache(email, code)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 发送邮件给用户</span></span><br><span class="line">		mail(<span class="string">&#x27;验证码验证服务&#x27;</span>, content, email)</span><br><span class="line">		<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;邮箱发送成功&#x27;</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4-md5进行密码加密"><a href="#3-4-md5进行密码加密" class="headerlink" title="3.4 md5进行密码加密"></a>3.4 md5进行密码加密</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_password</span>(<span class="params">mypass</span>):</span></span><br><span class="line"></span><br><span class="line">    md5 = hashlib.md5()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 定义加密对象</span></span><br><span class="line">    sign_str = mypass</span><br><span class="line">    <span class="comment"># 转码</span></span><br><span class="line">    sign_utf8 = <span class="built_in">str</span>(sign_str).encode(encoding=<span class="string">&quot;utf-8&quot;</span>)</span><br><span class="line">    <span class="comment"># 加密</span></span><br><span class="line">    md5.update(sign_utf8)</span><br><span class="line">    <span class="comment"># 生成密文</span></span><br><span class="line">    md5_server = md5.hexdigest()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> md5_server</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-注册接口"><a href="#4-注册接口" class="headerlink" title="4. 注册接口"></a>4. 注册接口</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Register</span>(<span class="params">APIView</span>):</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">post</span>(<span class="params">self, request</span>):</span></span><br><span class="line"></span><br><span class="line">		<span class="comment"># 接收参数</span></span><br><span class="line">		username = request.POST.get(<span class="string">&quot;username&quot;</span>, <span class="literal">None</span>)</span><br><span class="line">		password = request.POST.get(<span class="string">&quot;password&quot;</span>, <span class="literal">None</span>)</span><br><span class="line">		email = request.POST.get(<span class="string">&quot;email&quot;</span>, <span class="literal">None</span>)</span><br><span class="line">		phone = request.POST.get(<span class="string">&quot;phone&quot;</span>, <span class="literal">None</span>)</span><br><span class="line">		code = request.POST.get(<span class="string">&quot;code&quot;</span>, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># md5进行密码加密</span></span><br><span class="line">		str_md5 = make_password(password)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 校验数据</span></span><br><span class="line">		<span class="keyword">if</span> <span class="keyword">not</span> <span class="built_in">all</span>([username, password, email, phone, code]):</span><br><span class="line">			<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;数据不完整&#x27;</span>&#125;)</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> <span class="keyword">not</span> re.match(<span class="string">r&quot;^1[356789]\d&#123;9&#125;$&quot;</span>, phone):</span><br><span class="line">			<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;手机号不合法&#x27;</span>&#125;)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 用自定义方法，对比邮箱验证码</span></span><br><span class="line">		<span class="keyword">if</span> email_code(email, code):</span><br><span class="line">			<span class="comment"># 唯一性验证</span></span><br><span class="line">			<span class="keyword">try</span>:</span><br><span class="line">				user = User(username=username, password=str_md5, phone=phone, email=email)</span><br><span class="line">				user.save()</span><br><span class="line">				<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;注册成功&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">200</span>&#125;)</span><br><span class="line">			<span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">				print(e)</span><br><span class="line">				<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;注册失败&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">400</span>&#125;)</span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">			<span class="keyword">return</span> Response(&#123;<span class="string">&#x27;message&#x27;</span>: <span class="string">&#x27;验证码错误&#x27;</span>, <span class="string">&#x27;code&#x27;</span>: <span class="number">400</span>&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/1092093583/1092093583.github.io/2018/09/01/%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%83%BD-%E9%82%AE%E4%BB%B6%E9%AA%8C%E8%AF%81/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2018/11/01/vue%E5%AE%89%E8%A3%85/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            vue安装
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2018/06/01/docker%E4%BB%8B%E7%BB%8D%E4%BB%A5%E5%8F%8A%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">docker介绍以及安装使用</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2021
+        <i class="ri-heart-fill heart_icon"></i> 李 政 一
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/666.jpg" alt="李政一的技术博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">旅行</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">摄影</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script>
+
+<script src="/js/clickBoom1.js"></script>
+
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"center","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+
+</html>

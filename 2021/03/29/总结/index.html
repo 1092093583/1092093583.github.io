@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    总结 |  李政一的技术博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/source/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      <canvas class="fireworks"></canvas>
+      <style>
+        .fireworks {
+          position: fixed;
+          left: 0;
+          top: 0;
+          z-index: 99999;
+          pointer-events: none;
+        }
+      </style>
+      
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-总结"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  总结
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2021/03/29/%E6%80%BB%E7%BB%93/" class="article-date">
+  <time datetime="2021-03-29T02:09:57.000Z" itemprop="datePublished">2021-03-29</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.5k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">10 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="用户的三种校验方式"><a href="#用户的三种校验方式" class="headerlink" title="用户的三种校验方式"></a>用户的三种校验方式</h2><ul>
+<li><p>用户名和密码</p>
+<blockquote>
+<ul>
+<li>what you know</li>
+</ul>
+</blockquote>
+</li>
+<li><p>用户名和密钥</p>
+<blockquote>
+<ul>
+<li>what you have</li>
+</ul>
+</blockquote>
+</li>
+<li><p>用户名和实体</p>
+<blockquote>
+<ul>
+<li>who you are</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<hr>
+<h2 id="docker的基本操作"><a href="#docker的基本操作" class="headerlink" title="docker的基本操作"></a>docker的基本操作</h2><blockquote>
+<p>docker是一种容器技术,有三大核心:  <strong>镜像   容器    仓库</strong></p>
+</blockquote>
+<ul>
+<li>查看本地所有镜像<ul>
+<li>docker images</li>
+</ul>
+</li>
+<li>拉取镜像<ul>
+<li>docker pull 镜像名称</li>
+</ul>
+</li>
+<li>删除镜像<ul>
+<li>docker rmi 镜像id</li>
+</ul>
+</li>
+<li>镜像的导出<ul>
+<li>docker save -o ‘c:/tmp/redis.tar’ redis</li>
+</ul>
+</li>
+<li>镜像的导入<ul>
+<li>docker load -i ‘c:/tmp/redis.tar’</li>
+</ul>
+</li>
+<li>当前有哪些容器正在启动<ul>
+<li>docker ps</li>
+</ul>
+</li>
+<li>停止docker服务<ul>
+<li>docker stop 容器id</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="python实现设计模式——工厂模式"><a href="#python实现设计模式——工厂模式" class="headerlink" title="python实现设计模式——工厂模式"></a>python实现设计模式——工厂模式</h2><p>工厂模式，顾名思义就是我们可以通过指定的”工厂“获取需要的”产品“，在设计模式中主要用于抽象对象的创建过程，让用户可以指定自己想要的对象而不必关心对象的实例化过程。这样做的好处就是用户只需要通过固定的接口而不是直接去调用类的实例化方法来获取一个对象的实例，隐藏了实例创建过程的复杂度，解耦了生产实例和使用实例的代码，降低了维护的复杂度</p>
+<h3 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Mercedes</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    梅赛德斯</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Mercedes-Benz&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BMW</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    宝马</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;BMW&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>假设我们有两个品牌汽车分别Mercedes和BMW，如果没有”工厂“来生产他们，我们就要在代码中自己进行实例化。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mercedes = Mercedes()</span><br><span class="line">bmw = BMW()</span><br></pre></td></tr></table></figure>
+
+<p>但现实中，你可能会面临很多汽车产品，而且每个产品的构造参数也不相同，这样在创建实例的会麻烦，这时就可以构造一个”简单工厂“把所有汽车实例化过程封装在里面。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimpleCarFactory</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    简单工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">name</span>):</span></span><br><span class="line">        <span class="keyword">if</span> name == <span class="string">&quot;mb&quot;</span>:</span><br><span class="line">            <span class="keyword">return</span> Mercedes()</span><br><span class="line">        <span class="keyword">elif</span> name == <span class="string">&quot;bmw&quot;</span>:</span><br><span class="line">            <span class="keyword">return</span> BMW()</span><br></pre></td></tr></table></figure>
+
+<p>有了SimpleCarFactory类后，就可以通过固定的接口传入参数获得想要的对象实例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c1 = SimpleCarFactory.product_car(<span class="string">&quot;mb&quot;</span>)</span><br><span class="line">c2 = SimpleCarFactory.product_car(<span class="string">&quot;bmw&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h3><p>虽然有了一个简单的工厂，但在实际使用工厂的过程中，我们会发现新问题：如果我们要新增一个”产品“，例如Audi的汽车，我们除了新增一个Audi类外还要修改SimpleCarFactory内的product_car方法。这样就违背了软件设计中的开闭原则，即在拓展新的类时，尽量不要修改原有的代码。所以我们在简单工厂的基础上把SimpleCarFactory抽象成不同的工厂，每个工厂对应生成自己的产品，这就是工厂方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> abc</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractFactory</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    抽象工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    __metaclass__ = abc.ABCMeta</span><br><span class="line"></span><br><span class="line"><span class="meta">    @abc.abstactmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MercedesFactory</span>(<span class="params">AbstractFactory</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    梅赛德斯工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> Mercedes()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BMWFactory</span>(<span class="params">AbstractFactory</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    宝马工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> BMW()</span><br></pre></td></tr></table></figure>
+
+<p>我们把工厂抽象出来用abc模块实现一个抽象基类AbsstractFactory,这样就可以通过特定的工厂来获得特定的产品实例了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c1 = MercedesFactory.product_car()</span><br><span class="line">c2 = BMWFactory.product_car()</span><br></pre></td></tr></table></figure>
+
+<p>每个工厂负责生成自己的产品也避免了我们在新增产品时需要修改工厂的代码，而只要增加对应的工厂即可。如新增一个Audi产品，只需新增一个Audi类和AudiFactory类</p>
+<h3 id="抽象工厂"><a href="#抽象工厂" class="headerlink" title="抽象工厂"></a>抽象工厂</h3><p>工厂方法虽然解决了我们”修改代码“的问题，但如果我们要生产很多产品，就会发现我们同样需要写很多对应的工厂类。比如梅赛德斯和宝马不仅生产小汽车，还要生产suv，那我们用工厂方法就要再多构造两个生产suv的工厂类。所以为了解决这个问题，我们就要再更近一步的抽象工厂类，让一个工厂可以生产同一类的多个产品，这就是抽象工厂。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> abc</span><br><span class="line"></span><br><span class="line"><span class="comment"># 两种小汽车</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Mercedes_C63</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    梅赛德斯小汽车</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Mercedes-Benz:c63&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BMW_M3</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    宝马小汽车</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;BMW:M3&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 两种suv    </span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Mercedes_G63</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    梅赛德斯suv</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Mercedes-Benz:G63&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BMW_X5</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    宝马suv</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;BMW:x5&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AbstractFactory</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    抽象工厂</span></span><br><span class="line"><span class="string">    可以生产小汽车，还可以生产suv</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    __metaclass__ = abc.ABCMeta</span><br><span class="line"></span><br><span class="line"><span class="meta">    @abc.abstractmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abc.abstractmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_suv</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MercedesFactory</span>(<span class="params">AbstractFactory</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    梅赛德斯工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> Mercedes_C63()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_suv</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> Mercedes_G63()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BMWFactory</span>(<span class="params">AbstractFactory</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    宝马工厂</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_car</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> BMW_M3()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">product_suv</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> BMW_X5()    </span><br></pre></td></tr></table></figure>
+
+<p>我们让基类AbstractFactory同时可以生产汽车和SUV，然后MercedesFactory和BMWFactory继承AbstractFactory并重写product_car和product_suv方法即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">c1 = MercedesFactory().product_car()</span><br><span class="line">s1 = MercedesFactory().product_suv()</span><br><span class="line"></span><br><span class="line">c2 = BMWFactory().product_car()</span><br><span class="line">s2 = BMWFactory.product_car()</span><br></pre></td></tr></table></figure>
+
+<p>抽象工厂模式与工厂方法模式最大区别在于，抽象工厂中的一个工厂对象可以负责多个不同产品对象的创建，这样比工厂方法模式更为简单，有效率</p>
+<hr>
+<h2 id="权限模型"><a href="#权限模型" class="headerlink" title="权限模型"></a>权限模型</h2><h4 id="首先第一种也是相对较早的权限模型ACL"><a href="#首先第一种也是相对较早的权限模型ACL" class="headerlink" title="首先第一种也是相对较早的权限模型ACL"></a>首先第一种也是相对较早的权限模型ACL</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Access ControI List</span><br></pre></td></tr></table></figure>
+
+<p>ACL是最先也是最基本的一种访问控制机制，它的原理很是简单：每一项资源，都配有一个列表，这个列表记录的就是那些用户对这项资源执行增删改查的那些操作，当系统系统试图访问这项资源时，会首先检查这个列表中是否有关于当前用户的访问权限，从而确认当前的用户是否能执行相应的操作</p>
+<p>ACL是一种面向资源的访问控制模型，它的机制是围绕“资源”展开的</p>
+<p>在表结构中，定义用户、权限、节点(也就是可以进行CRUD的资源)三张表</p>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">user表</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">uid</td>
+<td align="left">int</td>
+<td align="left">主键</td>
+</tr>
+<tr>
+<td align="left">username</td>
+<td align="left">varchar()</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">password</td>
+<td align="left">varchar()</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">access表</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">user_id</td>
+<td align="left">int</td>
+<td align="left">外键关联用户表</td>
+</tr>
+<tr>
+<td align="left">node_id</td>
+<td align="left">int</td>
+<td align="left">外键关联节点表</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">node表</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">id</td>
+<td align="left">int</td>
+<td align="left">主键</td>
+</tr>
+<tr>
+<td align="left">node_name</td>
+<td align="left">varchar()</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<p>验证权限时，通过确认那个用户访问要那个资源，根据他的外键关联来使用sql语句查询是否有这个权限</p>
+<p>但是，如果用户量特别大的情况，需要要维护大量的权限表，ACL在性能上有明显的缺陷，另外，对于拥有大量用户与众多资源的应用，管理访问控制列表自己就非常繁重</p>
+<h4 id="基于角色的RBAC"><a href="#基于角色的RBAC" class="headerlink" title="基于角色的RBAC"></a>基于角色的RBAC</h4><p>RBAC 是把用户按照角色进行归并，通过用户角色来肯定用户可否针对某项资源进行某项操作。</p>
+<p>RBAC相对于ACL最大的优点就是简化了用户和权限的管理，经过对用户进行分类，使得角色与权限关联起来，使得角色和权限变成了间接关联</p>
+<p>RBAC认为权限实际就是who,what,how三者之间的关系，即who对what进行how的操作。</p>
+<ul>
+<li>Who:权限的拥有者或主体</li>
+<li>what:权限针对的的对象或者资源</li>
+<li>how:是对资源具体的怎么操作</li>
+</ul>
+<p>RBAC是面向资源的，他对用户的授权管理变得很是简单易于维护，所以有普遍的应用</p>
+<p>但是RBAC也是有自己的缺点的，因为他是以角色为载体的，如果角色下的个别用户需要分配一些特殊的权限定制，那么RBAC就无能为力，所以就要使用到ABAC，在下章文章中详解</p>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">user表</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">uid</td>
+<td align="left">int</td>
+<td align="left">主键</td>
+</tr>
+<tr>
+<td align="left">username</td>
+<td align="left">varchar()</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">password</td>
+<td align="left">varchar()</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">role表</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">id</td>
+<td align="left">int</td>
+<td align="left">主键</td>
+</tr>
+<tr>
+<td align="left">role_name</td>
+<td align="left">varchar()</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">access表</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">role_id</td>
+<td align="left">int</td>
+<td align="left">外键关联角色表</td>
+</tr>
+<tr>
+<td align="left">node_id</td>
+<td align="left">int</td>
+<td align="left">外键关联节点表</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">node表</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">id</td>
+<td align="left">int</td>
+<td align="left">主键</td>
+</tr>
+<tr>
+<td align="left">node_name</td>
+<td align="left">varchar()</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<h4 id="来吧，使用django代码实现一下RBAC"><a href="#来吧，使用django代码实现一下RBAC" class="headerlink" title="来吧，使用django代码实现一下RBAC"></a>来吧，使用django代码实现一下RBAC</h4><h6 id="首先在model-py中建好对应表"><a href="#首先在model-py中建好对应表" class="headerlink" title="首先在model.py中建好对应表"></a>首先在<code>model.py</code>中建好对应表</h6><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"><span class="comment">#导入时间域</span></span><br><span class="line"><span class="keyword">from</span> django.utils <span class="keyword">import</span> timezone</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#基类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span>(<span class="params">models.Model</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#创建时间</span></span><br><span class="line">    create_time = models.DateTimeField(default=timezone.now,null=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        abstract = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 角色表</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Relo</span>(<span class="params">Base</span>):</span></span><br><span class="line">    <span class="built_in">id</span> = models.AutoField(primary_key=<span class="literal">True</span>)</span><br><span class="line">    name = models.CharField(max_length=<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">&#x27;relo&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 用户类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span>(<span class="params">Base</span>):</span></span><br><span class="line">    <span class="built_in">id</span> = models.AutoField(primary_key=<span class="literal">True</span>)</span><br><span class="line">    username = models.CharField(max_length=<span class="number">100</span>)</span><br><span class="line">    password = models.CharField(max_length=<span class="number">200</span>)</span><br><span class="line">    phone = models.CharField(max_length=<span class="number">11</span>)</span><br><span class="line">    email = models.CharField(max_length=<span class="number">24</span>)</span><br><span class="line">    nickname = models.CharField(max_length=<span class="number">24</span>)</span><br><span class="line">    role = models.ForeignKey(Relo, on_delete=models.SET_NULL, null=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">&#x27;user&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 节点表</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>(<span class="params">Base</span>):</span></span><br><span class="line">    <span class="built_in">id</span> = models.AutoField(primary_key=<span class="literal">True</span>)</span><br><span class="line">    node_name = models.CharField(max_length=<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">&#x27;node&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 权限表</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Access</span>(<span class="params">Base</span>):</span></span><br><span class="line">    <span class="built_in">id</span> = models.AutoField(primary_key=<span class="literal">True</span>)</span><br><span class="line">    role = models.ForeignKey(Relo, on_delete=models.SET_NULL, null=<span class="literal">True</span>)</span><br><span class="line">    node = models.ForeignKey(Node, on_delete=models.SET_NULL, null=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        db_table = <span class="string">&quot;access&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="新建一个check-authority-py文件-定义用户权限类，定义一个查询用户管理方法，有权限返回True否则返回False"><a href="#新建一个check-authority-py文件-定义用户权限类，定义一个查询用户管理方法，有权限返回True否则返回False" class="headerlink" title="新建一个check_authority.py文件,定义用户权限类，定义一个查询用户管理方法，有权限返回True否则返回False"></a>新建一个check_authority.py文件,定义用户权限类，定义一个查询用户管理方法，有权限返回True否则返回False</h6><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">from</span> .utils <span class="keyword">import</span> chack_jwt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询用户权限</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserAuthority</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, token</span>):</span></span><br><span class="line">        self.db = pymysql.connect(host=<span class="string">&quot;127.0.0.1&quot;</span>, port=<span class="number">3306</span>, database=<span class="string">&#x27;workflow&#x27;</span>, user=<span class="string">&#x27;root&#x27;</span>, password=<span class="string">&quot;mysql&quot;</span>, charset=<span class="string">&quot;utf8&quot;</span>)</span><br><span class="line">        self.cursor = self.db.cursor()</span><br><span class="line">        self.token = token</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 查询用户管理权限</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">manage_authority</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.token:</span><br><span class="line">            token = self.token[<span class="number">4</span>:]</span><br><span class="line">            uid = chack_jwt(token).get(<span class="string">&quot;uid&quot;</span>)</span><br><span class="line"></span><br><span class="line">            self.cursor.execute(<span class="string">&quot;select a.username,b.name,c.node_id,d.node_name from user a left join role b on a.role_id=b.id left join access c on b.id=c.role_id left join node d on c.node_id=d.id &quot;</span></span><br><span class="line">                                <span class="string">&quot;where a.id=&quot;</span></span><br><span class="line">                                +<span class="built_in">str</span>(uid))</span><br><span class="line">            <span class="comment"># 获取查询结果</span></span><br><span class="line">            desc = self.cursor.description</span><br><span class="line">            result = [<span class="built_in">dict</span>(<span class="built_in">zip</span>([col[<span class="number">0</span>] <span class="keyword">for</span> col <span class="keyword">in</span> desc], row)) <span class="keyword">for</span> row <span class="keyword">in</span> self.cursor.fetchall()]</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 如果权限包括用户管理那就可以放行</span></span><br><span class="line">            <span class="keyword">for</span> ui <span class="keyword">in</span> result:</span><br><span class="line">                <span class="keyword">if</span> ui.get(<span class="string">&quot;node_name&quot;</span>) == <span class="string">&quot;用户管理&quot;</span>:</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="然后在中间件中进行调用"><a href="#然后在中间件中进行调用" class="headerlink" title="然后在中间件中进行调用"></a>然后在中间件中进行调用</h6><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyMiddleware</span>(<span class="params">MiddlewareMixin</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request</span>):</span></span><br><span class="line">        url = request.META.get(<span class="string">&quot;PATH_INFO&quot;</span>)</span><br><span class="line">        <span class="keyword">if</span> url == <span class="string">&quot;/myapp/userview/&quot;</span>:</span><br><span class="line">            token = request.META.get(<span class="string">&quot;HTTP_AUTHORIZATION&quot;</span>, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 调用定义好的类方法，True就不做任何操作，直接放行，否则直接返回没有权限</span></span><br><span class="line">            authority = UserAuthority(token=token).manage_authority()</span><br><span class="line">            <span class="keyword">if</span> authority:</span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> HttpResponse(json.dumps(&#123;<span class="string">&quot;code&quot;</span>: <span class="string">&quot;999&quot;</span>, <span class="string">&quot;data&quot;</span>: <span class="string">&quot;您没有权限&quot;</span>&#125;, ensure_ascii=<span class="literal">False</span>))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_view</span>(<span class="params">self, request, view_func, view_args, view_kwargs</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_exception</span>(<span class="params">self, request, exception</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_response</span>(<span class="params">self, request, response</span>):</span></span><br><span class="line">        <span class="keyword">return</span> response</span><br></pre></td></tr></table></figure>
+
+<h6 id="然后在settings的MIDDLEWARE中进行注册就可以了，就是这么简单"><a href="#然后在settings的MIDDLEWARE中进行注册就可以了，就是这么简单" class="headerlink" title="然后在settings的MIDDLEWARE中进行注册就可以了，就是这么简单"></a>然后在settings的MIDDLEWARE中进行注册就可以了，就是这么简单</h6> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/1092093583/1092093583.github.io/2021/03/29/%E6%80%BB%E7%BB%93/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%80%BB%E7%BB%93/" rel="tag">总结</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2021/04/06/git/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            git
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2021/03/24/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B8%8E%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">设计模式与开发模式</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2021
+        <i class="ri-heart-fill heart_icon"></i> 李 政 一
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/666.jpg" alt="李政一的技术博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">旅行</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">摄影</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script>
+
+<script src="/js/clickBoom1.js"></script>
+
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"center","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+
+</html>

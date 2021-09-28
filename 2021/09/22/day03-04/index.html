@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    自学测试day03-04 |  李政一的技术博客
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/source/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      <canvas class="fireworks"></canvas>
+      <style>
+        .fireworks {
+          position: fixed;
+          left: 0;
+          top: 0;
+          z-index: 99999;
+          pointer-events: none;
+        }
+      </style>
+      
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-day03-04"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  自学测试day03-04
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2021/09/22/day03-04/" class="article-date">
+  <time datetime="2021-09-22T14:00:07.000Z" itemprop="datePublished">2021-09-22</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">6 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="day03"><a href="#day03" class="headerlink" title="day03"></a>day03</h1><h3 id="1-软件缺陷定义"><a href="#1-软件缺陷定义" class="headerlink" title="1.软件缺陷定义"></a>1.软件缺陷定义</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">俗称bug，</span><br><span class="line">1.软件未达到产品说明书 （没有 必须需要的功能）</span><br><span class="line">2.出现产品说明书指明不会出现的错误 （说明书记载的错误）</span><br><span class="line">3.功能超出产品说明书指明的范围	（添加说明书以为的功能）</span><br><span class="line">4.未达到产品说明书虽未指出但应该达到的目标	（说明书内没记载的错误）</span><br><span class="line">5.难以理解、不易使用，用户认为不好的	（用户认为不需要的功能）</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-软件缺陷产生的原因"><a href="#2-软件缺陷产生的原因" class="headerlink" title="2.软件缺陷产生的原因"></a>2.软件缺陷产生的原因</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.编码问题</span><br><span class="line">2.软件结构复杂</span><br><span class="line">3.项目期限短</span><br><span class="line">4.使用新技术</span><br><span class="line">5.频繁更新需求</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-软件缺陷分类"><a href="#3-软件缺陷分类" class="headerlink" title="3.软件缺陷分类"></a>3.软件缺陷分类</h3><p><img src="/case/img01.jpg"></p>
+<h3 id="4-常用软件缺陷管理工具"><a href="#4-常用软件缺陷管理工具" class="headerlink" title="4.常用软件缺陷管理工具"></a>4.常用软件缺陷管理工具</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">禅道，jira，gitee</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-软件测试简介"><a href="#5-软件测试简介" class="headerlink" title="5.软件测试简介"></a>5.软件测试简介</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过人工或自动化的方式来验证软件的实际结果与用户需求是否一致的过程</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="6-软件测试的目的"><a href="#6-软件测试的目的" class="headerlink" title="6.软件测试的目的"></a>6.软件测试的目的</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.以最少的人力、物力和时间找出软件中潜在的各种错误和bug，避免软件发布后带来的商业风险</span><br><span class="line">2.利用测试过程中得到的测试结果和测试信息，作为后续项目开发和测试过程改进的重要输入，避免在将来的项目开发中和测试中重复同样的错误</span><br><span class="line">3.采用更加高效的测试管理手段，提高软件测试的效率和软件产品的质量</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="7-软件测试与开发的关系"><a href="#7-软件测试与开发的关系" class="headerlink" title="7.软件测试与开发的关系"></a>7.软件测试与开发的关系</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">开发：是生产制造软件产品</span><br><span class="line">测试：是效验产品是否合格</span><br><span class="line">两者密切合作才能保证软件产品的质量</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="8-软件测试模型"><a href="#8-软件测试模型" class="headerlink" title="8.软件测试模型"></a>8.软件测试模型</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">V模型 和 W模型</span><br></pre></td></tr></table></figure>
+
+<h4 id="V模型："><a href="#V模型：" class="headerlink" title="V模型："></a>V模型：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">明确地标明了测试过程中存在级别，一步一步来</span><br></pre></td></tr></table></figure>
+
+<p><img src="/case/img06.jpg"></p>
+<h4 id="W模型："><a href="#W模型：" class="headerlink" title="W模型："></a>W模型：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">测试与开发是同步进行的，从而有利于尽早地发现问题</span><br></pre></td></tr></table></figure>
+
+<p><img src="/case/img07.jpg"></p>
+<h3 id="9-测试流程"><a href="#9-测试流程" class="headerlink" title="9.测试流程"></a>9.测试流程</h3><p><img src="/case/img08.jpg"></p>
+<h3 id="10-软件测试原则"><a href="#10-软件测试原则" class="headerlink" title="10.软件测试原则"></a>10.软件测试原则</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">1.测试显示软件存在Bug	（测试只能证明软件中存在bug，但不能证明软件中不存在Bug）</span><br><span class="line">2.穷尽测试是不可能的	（复杂度高，想做到完全性的测试是不可能的）</span><br><span class="line">3.测试尽早介入	（bug发现越早，修复的成本就越小）</span><br><span class="line">4.Bug集群性(2&#x2F;8原则)		（小部分模块包含大部分Bug）</span><br><span class="line">5.杀虫剂悖(bei)论	（测试用例应当定期修订和评审，增加新的或不同的测试用例）</span><br><span class="line">6.测试活动依赖于测试内容	（软件测试的活动开展依赖于所测试的内容）</span><br><span class="line">7.没有错误是好是谬论		（有可能99%没有bug的软件也是不能使用的）</span><br><span class="line">8.程序员不能自测之后上线</span><br><span class="line">9.严格执行测试计划，排除测试的随意性</span><br><span class="line">10.应当对每一个测试结果做全面的检查</span><br><span class="line">11.妥善保存测试计划、测试用例、出错统计和最终分析报告，为维护提供方便 </span><br><span class="line">12.设计测试用例时，应当包括合理的输入数据和不合理的输入数据 </span><br><span class="line">13.测试用例应由测试数据和与之对应的预期输出结果这两部分组成</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="11-测试区分"><a href="#11-测试区分" class="headerlink" title="11.测试区分"></a>11.测试区分</h3><h4 id="11-1-按照测试原理分类："><a href="#11-1-按照测试原理分类：" class="headerlink" title="11-1.按照测试原理分类："></a>11-1.按照测试原理分类：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">黑盒测试：只关心输入数据和输出结果</span><br><span class="line">白盒测试：是一种按照程序内部逻辑结构和编码结构设计测试数据</span><br><span class="line">灰盒测试：一种程序运行时的外部变现同时又结合内部结构来设计测试数据的测试方法</span><br></pre></td></tr></table></figure>
+
+<p><img src="/case/img10.jpg"></p>
+<h4 id="11-2-按照测试阶段分类"><a href="#11-2-按照测试阶段分类" class="headerlink" title="11-2.按照测试阶段分类"></a>11-2.按照测试阶段分类</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">单元测试：对一个模块、一个函数或者一个类来测试</span><br><span class="line">集成测试：单元测试后，将单独的模块按照设计要求组装成子系统或系统，作为整体进行测试</span><br><span class="line">系统测试：集成测试后，将硬件、软件看作一个整体、对系统的功能及性能的总体测试</span><br><span class="line">验收测试：系统测试后，以用户测试为主，或有测试人员共同参与检验软件质量</span><br></pre></td></tr></table></figure>
+
+<p><img src="/case/img11.jpg"></p>
+<h4 id="11-3-按照内容分类"><a href="#11-3-按照内容分类" class="headerlink" title="11-3.按照内容分类"></a>11-3.按照内容分类</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">功能测试、性能测试、兼容性测试</span><br></pre></td></tr></table></figure>
+
+<h5 id="11-3-1-功能测试"><a href="#11-3-1-功能测试" class="headerlink" title="11-3.1.功能测试"></a>11-3.1.功能测试</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">功能测试：</span><br><span class="line">	根据产品操作描述和需求文档，测试一个产品的特性和可操作行为是否满足用户需求的</span><br><span class="line"></span><br><span class="line">界面测试：用户界面的模块的布局是否符合客户使用习惯，界面操作便捷性、导航简单易懂性性的测试</span><br><span class="line">冒烟测试：验证系统的核心功能是否能够正常运行的测试方法</span><br><span class="line">回归测试：修改了旧代码后，重新进行测试</span><br><span class="line">业务逻辑测试：在基本的功能点都已合格的基础上，准备多种测试数据</span><br><span class="line">易用性测试：指用户使用软件时是否感觉方便的测试</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="11-3-2-性能测试"><a href="#11-3-2-性能测试" class="headerlink" title="11-3.2.性能测试"></a>11-3.2.性能测试</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">性能测试：</span><br><span class="line">	通过自动化的测试工具模拟多种正常、峰值以及异常负载条件来对系统的各项性能指标进行效验的测试方法。</span><br><span class="line">	</span><br><span class="line">压力测试：通过逐步增加系统负载，测试系统性能的变化，并确定在什么条件下系统性能处于失效状态。</span><br><span class="line">负载测试：通过逐步增加系统负载，测试系统性能的变化，在满足性能指标的情况下，系统所能承受的最大负载量的测试。</span><br><span class="line">并发测试：是一个负载测试和压力测试的过程，即逐渐增加并发用户数负载直到系统的瓶颈，通过分析资源监控指标来确定系统并发性能</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="11-3-3-兼容性测试"><a href="#11-3-3-兼容性测试" class="headerlink" title="11-3.3.兼容性测试"></a>11-3.3.兼容性测试</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">冒烟测试、随机测试、安全性测试、探索性测试、回归测试、Alpha测试、Beta测试</span><br><span class="line"></span><br><span class="line">随机测试：主要是根据测试者的经验无需测试用例对软件进行功能和性能抽查的测试方法</span><br><span class="line">安全性测试：通过不同的测试方法、检验程序、网络、数据库安全性的测试方法</span><br><span class="line">探索性测试：碰到问题时能随机应变，强调测试人员的主观能动性明确整体的测试计划的测试方法</span><br><span class="line">Alpha测试：内侧。α测试。内部环境下的测试，开发人员或测试人员在现场</span><br><span class="line">Beta测试：外侧、公测、β测试。生产环境下的测试，开发人员和测试人员都不在现场</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="12-测试计划"><a href="#12-测试计划" class="headerlink" title="12.测试计划"></a>12.测试计划</h3><h4 id="12-1-概念定义"><a href="#12-1-概念定义" class="headerlink" title="12-1.概念定义:"></a>12-1.概念定义:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">制定测试目的、范围、方法、时间进度及软件测试重点的过程</span><br></pre></td></tr></table></figure>
+
+<h4 id="12-2-测试目的编写结构"><a href="#12-2-测试目的编写结构" class="headerlink" title="12-2.测试目的编写结构"></a>12-2.测试目的编写结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.目的的总体概述</span><br><span class="line">2.包含详细描述</span><br></pre></td></tr></table></figure>
+
+<h4 id="12-3-测试目的编写内容"><a href="#12-3-测试目的编写内容" class="headerlink" title="12-3.测试目的编写内容"></a>12-3.测试目的编写内容</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.程序是否满足需求</span><br><span class="line">2.程序是否存在Bug</span><br><span class="line">3.系统或产品顺利发布</span><br></pre></td></tr></table></figure>
+
+<h4 id="12-4-人力资源"><a href="#12-4-人力资源" class="headerlink" title="12-4.人力资源"></a>12-4.人力资源</h4><p><img src="/case/img011.jpg"></p>
+<h4 id="12-5-系统资源"><a href="#12-5-系统资源" class="headerlink" title="12-5.系统资源"></a>12-5.系统资源</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">硬件资源、软件资源</span><br></pre></td></tr></table></figure>
+
+<h4 id="12-6-测试范围"><a href="#12-6-测试范围" class="headerlink" title="12-6.测试范围"></a>12-6.测试范围</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">测试对象、测试的特性、不测试的特性</span><br></pre></td></tr></table></figure>
+
+<h4 id="12-7-测试风险"><a href="#12-7-测试风险" class="headerlink" title="12-7.测试风险"></a>12-7.测试风险</h4><p><img src="/case/img03.jpg"></p>
+<h4 id="12-8-人员分工"><a href="#12-8-人员分工" class="headerlink" title="12-8.人员分工"></a>12-8.人员分工</h4><p><img src="/case/img04.jpg"></p>
+<h4 id="12-9-测试策略"><a href="#12-9-测试策略" class="headerlink" title="12-9.测试策略"></a>12-9.测试策略</h4><p><img src="/case/img05.jpg"></p>
+<h4 id="12-10-测试准则"><a href="#12-10-测试准则" class="headerlink" title="12-10.测试准则"></a>12-10.测试准则</h4><ul>
+<li><p>启动准则：满足什么情况可以进行测试</p>
+</li>
+<li><p>暂停准则：遇到什么情况测试要暂停</p>
+</li>
+<li><p>再启动准则：在什么情况下可以重新启动测试</p>
+</li>
+<li><p>结束准则：什么情况可以停止测试</p>
+<p><img src="/case/img066.jpg"></p>
+</li>
+</ul>
+<p><img src="/case/img077.jpg"></p>
+<h4 id="12-11-测试进度"><a href="#12-11-测试进度" class="headerlink" title="12-11.测试进度"></a>12-11.测试进度</h4><p><img src="/case/img10.jpg"></p>
+<p><img src="/case/img088.jpg"></p>
+<h4 id="12-12-测试输出"><a href="#12-12-测试输出" class="headerlink" title="12-12.测试输出"></a>12-12.测试输出</h4><p><img src="/case/img09.jpg"></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/1092093583/1092093583.github.io/2021/09/22/day03-04/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2021/09/23/day05/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            自学测试day05
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2021/09/22/day01-02/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">自学测试day01-02</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "",
+    app_key: "",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2021
+        <i class="ri-heart-fill heart_icon"></i> 李 政 一
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/666.jpg" alt="李政一的技术博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">旅行</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">摄影</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script>
+
+<script src="/js/clickBoom1.js"></script>
+
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+<script src="/js/dz.js"></script>
+
+
+
+    
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"center","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+
+</html>
